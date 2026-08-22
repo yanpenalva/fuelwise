@@ -10,21 +10,25 @@ class CurrencyInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    final String digits = newValue.text
+    var significant = newValue.text
         .split('')
         .where(_digitsOnly.hasMatch)
         .join();
 
-    if (digits.isEmpty || digits == '00') {
+    while (significant.length > 2 && significant.startsWith('0')) {
+      significant = significant.substring(1);
+    }
+
+    if (significant.isEmpty) {
       return const TextEditingValue(
         text: '',
         selection: TextSelection.collapsed(offset: 0),
       );
     }
 
-    final String trimmed = digits.length > _maxDigits
-        ? digits.substring(digits.length - _maxDigits)
-        : digits;
+    final String trimmed = significant.length > _maxDigits
+        ? significant.substring(significant.length - _maxDigits)
+        : significant;
     final String formatted = _formatCents(trimmed);
     final int offset = formatted.length;
 
