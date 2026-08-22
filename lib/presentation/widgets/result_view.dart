@@ -264,11 +264,13 @@ class ResultView extends StatelessWidget {
   }
 
   Color _differenceColor(BuildContext context, Decimal difference) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (difference >= Decimal.zero) {
-      return Colors.green.shade700;
+      return isDark ? Colors.green.shade400 : Colors.green.shade700;
     }
 
-    return Colors.deepOrange.shade700;
+    return isDark ? Colors.deepOrange.shade300 : Colors.deepOrange.shade700;
   }
 
   Color _recommendationColor(FuelType fuel) {

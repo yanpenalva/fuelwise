@@ -16,6 +16,8 @@ class FuelwiseApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fuelwise',
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
