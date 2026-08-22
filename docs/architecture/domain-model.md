@@ -13,7 +13,7 @@ Location: `lib/domain/`. The domain has no dependency on Flutter, Riverpod, Drif
 - `VehicleProfile` — NOT FOUND (V1, persistence phase)
 - `CalculationHistoryEntry` — NOT FOUND (V1, persistence phase)
 
-All numeric fields use `Decimal` (ADR-002). Value objects validate their invariants in constructors: prices and consumption values must be greater than zero; efficiency requires at least one consumption value.
+All numeric fields use `Decimal` (ADR-002). Value objects validate their invariants in constructors: prices and consumption values must be greater than zero; efficiency requires at least one consumption value. `FuelCalculationInput.ratio` is an exact `Rational`; `applyCustomThreshold` decouples cost calculation (always derived from available consumption) from the user's threshold rule choice.
 
 ## Core rules
 

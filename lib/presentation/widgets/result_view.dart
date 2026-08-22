@@ -14,8 +14,6 @@ class ResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final NumberFormat moneyFormat = NumberFormat('#,##0.00', 'pt_BR');
-    final NumberFormat ratioFormat = NumberFormat('#,##0.000', 'pt_BR');
 
     return SingleChildScrollView(
       child: Padding(
@@ -45,11 +43,11 @@ class ResultView extends StatelessWidget {
                 children: <Widget>[
                   _metricTile(
                     'Proporção etanol/gasolina',
-                    ratioFormat.format(result.ratio.toDouble()),
+                    _formatRatio(result.ratio),
                   ),
                   _metricTile(
                     'Limiar aplicado',
-                    ratioFormat.format(result.appliedThreshold.toDouble()),
+                    _formatRatio(result.appliedThreshold),
                   ),
                   _metricTile(
                     'Fonte da regra',
@@ -57,7 +55,7 @@ class ResultView extends StatelessWidget {
                   ),
                   _metricTile(
                     'Diferença',
-                    ratioFormat.format(result.difference.toDouble()),
+                    _formatRatio(result.difference),
                   ),
                 ],
               ),
@@ -69,16 +67,14 @@ class ResultView extends StatelessWidget {
                   _costPerKmTile(
                     'Custo por km — gasolina',
                     result.gasolineCostPerKilometer,
-                    moneyFormat,
                   ),
                   _costPerKmTile(
                     'Custo por km — etanol',
                     result.ethanolCostPerKilometer,
-                    moneyFormat,
                   ),
                   _metricTile(
                     'Preço máximo recomendado do etanol',
-                    'R\$ ${moneyFormat.format(result.maximumEthanolPrice.toDouble())}',
+                    'R\$ ${_formatMoney(result.maximumEthanolPrice)}',
                   ),
                 ],
               ),
@@ -102,7 +98,6 @@ class ResultView extends StatelessWidget {
   Widget _costPerKmTile(
     String label,
     Decimal? costPerKilometer,
-    NumberFormat moneyFormat,
   ) {
     if (costPerKilometer == null) {
       return ListTile(
@@ -114,10 +109,42 @@ class ResultView extends StatelessWidget {
     return ListTile(
       title: Text(label),
       subtitle: Text(
-        'R\$ ${moneyFormat.format(costPerKilometer.toDouble())}',
+        'R\$ ${_formatMoney(costPerKilometer)}',
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),
     );
+  }
+
+  String _formatMoney(Decimal value) {
+    return _formatScaled(value, 2);
+  }
+
+  String _formatRatio(Decimal value) {
+    return _formatScaled(value, 3);
+  }
+
+  String _formatScaled(Decimal value, int scale) {
+    final bool isNegative = value < Decimal.zero;
+    final Decimal absolute = isNegative ? -value : value;
+    final BigInt smallestUnits =
+        (absolute * Decimal.fromInt(_pow10(scale))).round().toBigInt();
+    final String digits = smallestUnits.toString().padLeft(scale + 1, '0');
+    final String intPart = digits.substring(0, digits.length - scale);
+    final String fracPart = digits.substring(digits.length - scale);
+    final NumberFormat integerFormat = NumberFormat('#,##0', 'pt_BR');
+    final String sign = isNegative ? '-' : '';
+
+    return '$sign${integerFormat.format(int.parse(intPart))},$fracPart';
+  }
+
+  static int _pow10(int exponent) {
+    var result = 1;
+
+    for (var i = 0; i < exponent; i++) {
+      result *= 10;
+    }
+
+    return result;
   }
 
   String _recommendationText(FuelType fuel) {

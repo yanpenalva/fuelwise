@@ -81,6 +81,17 @@ void main() {
         const FuelInputParseFailure(FuelInputMessages.invalidNumber),
       );
     });
+
+    test('rejects multi-separator numbers', () {
+      expect(
+        parseRequiredPositiveDecimal('1.2.3'),
+        const FuelInputParseFailure(FuelInputMessages.invalidNumber),
+      );
+      expect(
+        parseRequiredPositiveDecimal('1,2,3'),
+        const FuelInputParseFailure(FuelInputMessages.invalidNumber),
+      );
+    });
   });
 
   group('FuelInputParseResult types', () {

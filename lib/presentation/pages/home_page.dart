@@ -101,6 +101,7 @@ class _HomePageState extends State<HomePage> {
             gasolineConsumptionResult,
             ethanolConsumptionResult,
           ),
+          applyCustomThreshold: _rule == ComparisonRule.custom,
         ),
       );
     });
@@ -110,10 +111,6 @@ class _HomePageState extends State<HomePage> {
     FuelInputParseResult gasolineConsumptionResult,
     FuelInputParseResult ethanolConsumptionResult,
   ) {
-    if (_rule != ComparisonRule.custom) {
-      return null;
-    }
-
     final Decimal? gasolineConsumption = _successValue(gasolineConsumptionResult);
     final Decimal? ethanolConsumption = _successValue(ethanolConsumptionResult);
 

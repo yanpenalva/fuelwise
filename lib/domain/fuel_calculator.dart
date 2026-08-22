@@ -16,26 +16,23 @@ class FuelCalculator {
     final Rational ratio = input.ratio;
     final VehicleEfficiency? efficiency = input.efficiency;
 
-    Rational activeThreshold;
-    ThresholdSource thresholdSource;
-    if (efficiency != null && efficiency.isComplete) {
+    Rational activeThreshold = FuelThreshold.standard.toRational();
+    ThresholdSource thresholdSource = ThresholdSource.standard;
+    if (input.applyCustomThreshold &&
+        efficiency != null &&
+        efficiency.isComplete) {
       activeThreshold =
           efficiency.ethanolKmPerLiter!.toRational() /
           efficiency.gasolineKmPerLiter!.toRational();
       thresholdSource = ThresholdSource.custom;
-    } else {
-      activeThreshold = FuelThreshold.standard.toRational();
-      thresholdSource = ThresholdSource.standard;
     }
 
     final Decimal ratioDecimal = _toDecimal(ratio);
     final Decimal appliedThreshold = _toDecimal(activeThreshold);
 
-    FuelType recommendedFuel;
+    FuelType recommendedFuel = FuelType.gasoline;
     if (ratio <= activeThreshold) {
       recommendedFuel = FuelType.ethanol;
-    } else {
-      recommendedFuel = FuelType.gasoline;
     }
 
     final Decimal? gasolineCostPerKilometer = _costPerKilometer(

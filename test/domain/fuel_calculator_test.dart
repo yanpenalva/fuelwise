@@ -15,6 +15,7 @@ void main() {
     required String gasolinePrice,
     required String ethanolPrice,
     VehicleEfficiency? efficiency,
+    bool applyCustomThreshold = true,
   }) {
     return FuelCalculationInput(
       gasolinePrice: FuelPrice(
@@ -26,6 +27,7 @@ void main() {
         value: Decimal.parse(ethanolPrice),
       ),
       efficiency: efficiency,
+      applyCustomThreshold: applyCustomThreshold,
     );
   }
 
@@ -91,6 +93,41 @@ void main() {
         expect(result.appliedThreshold, Decimal.parse('0.90'));
         expect(result.thresholdSource, ThresholdSource.custom);
         expect(result.recommendedFuel, FuelType.ethanol);
+      });
+
+      test('recommends ethanol when ratio equals custom threshold exactly', () {
+        final efficiency = VehicleEfficiency(
+          gasolineKmPerLiter: Decimal.parse('10'),
+          ethanolKmPerLiter: Decimal.parse('7'),
+        );
+        final result = calculator.calculate(buildInput(
+          gasolinePrice: '10.00',
+          ethanolPrice: '7.00',
+          efficiency: efficiency,
+        ));
+
+        expect(result.appliedThreshold, Decimal.parse('0.70'));
+        expect(result.thresholdSource, ThresholdSource.custom);
+        expect(result.recommendedFuel, FuelType.ethanol);
+      });
+
+      test(
+          'keeps standard threshold with complete consumption when custom rule '
+          'is not applied but still reports costs', () {
+        final efficiency = VehicleEfficiency(
+          gasolineKmPerLiter: Decimal.parse('10'),
+          ethanolKmPerLiter: Decimal.parse('9'),
+        );
+        final result = calculator.calculate(buildInput(
+          gasolinePrice: '6.00',
+          ethanolPrice: '4.50',
+          efficiency: efficiency,
+          applyCustomThreshold: false,
+        ));
+
+        expect(result.thresholdSource, ThresholdSource.standard);
+        expect(result.gasolineCostPerKilometer, isNotNull);
+        expect(result.ethanolCostPerKilometer, isNotNull);
       });
     });
 
