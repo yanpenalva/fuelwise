@@ -6,7 +6,7 @@ The product is intentionally local: after installation, calculations, vehicle pr
 
 ## Current status
 
-The repository currently contains the approved product plan and implementation tasks. Product code will be implemented in the order described in [`docs/planning/execution-order.md`](docs/planning/execution-order.md).
+The ENV phase is implemented: the development Docker image and Compose setup are in place, and the toolchain inside the container is smoke-tested (`flutter analyze`, `flutter test`, and `flutter build apk` run in the container). Product code starts with V0, following [`docs/planning/execution-order.md`](docs/planning/execution-order.md).
 
 ## Product scope
 
@@ -30,6 +30,7 @@ The following are out of scope: backend services, cloud synchronization, multipl
 
 Start with the English documentation in [`docs/README.md`](docs/README.md). The complete task breakdown remains organized under [`docs/tasks/`](docs/tasks/).
 
+- [`docs/development/getting-started.md`](docs/development/getting-started.md) — **setup, daily commands, and on-device debugging (start here)**.
 - [`docs/planning/`](docs/planning/) — scope, environment, versions, and execution order.
 - [`docs/architecture/`](docs/architecture/) — architecture, domain, state, and persistence decisions.
 - [`docs/adr/`](docs/adr/) — architecture decision records.
@@ -38,19 +39,20 @@ Start with the English documentation in [`docs/README.md`](docs/README.md). The 
 - [`docs/hosting/`](docs/hosting/) — local APK distribution.
 - [`docs/tasks/`](docs/tasks/) — small, independently reviewable implementation tasks.
 
-## Planned commands
+## Commands
 
-The canonical commands will run through Docker and are documented in [`docs/planning/environment.md`](docs/planning/environment.md):
+All Flutter/SDK work happens inside the container. The host requires only Docker, Docker Compose, and `adb` for device steps.
 
 ```bash
-docker compose build dev
-docker compose run --rm dev flutter pub get
-docker compose run --rm dev flutter analyze
-docker compose run --rm dev flutter test
-docker compose run --rm dev flutter build apk --debug
+docker compose build dev                                        # build/rebuild image
+docker compose run --rm dev flutter pub get                     # install deps
+docker compose run --rm dev flutter analyze                     # static analysis
+docker compose run --rm dev flutter test                        # tests
+docker compose run --rm dev flutter build apk --debug           # debug APK
+docker compose run --rm dev bash                                # shell into container
 ```
 
-The Android emulator and USB/ADB remain on the host. The main development container provides Flutter, Dart, Android SDK tools, analysis, tests, and APK builds.
+Full workflow — including installing on a phone and running with hot reload over Wi-Fi — is documented in [`docs/development/getting-started.md`](docs/development/getting-started.md). Prerequisites and pinned versions: [`docs/planning/environment.md`](docs/planning/environment.md).
 
 ## License
 
