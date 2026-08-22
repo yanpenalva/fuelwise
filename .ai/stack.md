@@ -1,0 +1,54 @@
+# Stack
+
+Fuelwise is an offline-first Flutter Android application. No backend, no cloud, no Flutter Web.
+
+## Stack
+
+| Component | Role | Status |
+|-----------|------|--------|
+| Flutter `3.47.1` (Android target) | Application framework | Pinned — see versions table in [`docs/planning/environment.md`](../docs/planning/environment.md) |
+| Dart `3.13.1` | Language (bundled with Flutter) | Bundled |
+| Riverpod | State management (V1) | Planned |
+| Drift | Local persistence (V1) | Planned |
+| shared_preferences | Lightweight preferences (V1) | Planned |
+| Docker + Docker Compose (`dev` service) | Reproducible dev environment | Implemented — image `fuelwise-dev`, smoke-tested 2026-08-22 |
+| Android SDK / Build Tools / NDK | APK builds inside container (API 36, minSdk 24) | Implemented; on-device install validated 2026-08-22 |
+
+Versions are pinned in the "Versions and prerequisites" section of `docs/planning/environment.md` (recorded by ENV-001). Do not assume a version that is not documented there.
+
+## Responsibilities split
+
+- **Container**: Flutter, Dart, Android SDK tools, `flutter analyze`, `flutter test`, `flutter build apk`.
+- **Host**: Docker, Docker Compose, ADB (platform-tools), USB/device connection, local APK server (HOST phase).
+- **Device**: physical Android phone for installation and offline validation.
+
+## Required installations
+
+### Host
+
+1. Docker Engine and Docker Compose plugin.
+2. Android platform-tools (`adb`) for device testing.
+3. `rtk` wrapper for all shell commands.
+
+### Container (provided by the dev image, not installed manually)
+
+- Flutter SDK (version pinned by ENV-001).
+- Android SDK, Build Tools, and JDK.
+
+No host-side Flutter installation is required once the ENV image exists; before that, any temporary host-side Flutter must match the versions recorded by ENV-001.
+
+## Canonical commands (defined by ENV phase)
+
+```bash
+docker compose build dev
+docker compose run --rm dev flutter pub get
+docker compose run --rm dev flutter analyze
+docker compose run --rm dev flutter test
+docker compose run --rm dev flutter build apk --debug
+```
+
+These commands do not exist yet until ENV-003/ENV-004 are implemented. If `docker-compose.yml` is absent, record:
+
+```
+NOT FOUND
+```
