@@ -1,0 +1,1 @@
+enum FuelType { gasoline, ethanol }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:workdir/main.dart';
+import 'package:fuelwise/main.dart';
 
 void main() {
   testWidgets('renders the Fuelwise home page', (WidgetTester tester) async {
