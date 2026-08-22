@@ -1,0 +1,25 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        UID: "1000"
+        GID: "1000"
+    image: fuelwise-dev
+    volumes:
+      - .:/workdir
+      - pub_cache:/opt/flutter/.pub-cache
+      - android_debug_keystore:/home/dev/.android
+    working_dir: /workdir
+    stdin_open: true
+    tty: true
+    environment:
+      ANDROID_ADB_SERVER_ADDRESS: host.docker.internal
+      ANDROID_ADB_SERVER_PORT: "5037"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  pub_cache:
+  android_debug_keystore:

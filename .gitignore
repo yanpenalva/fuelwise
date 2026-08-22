@@ -1,13 +1,16 @@
 # Miscellaneous
 *.class
-*.lock
 *.log
 *.pyc
 *.swp
 .buildlog/
 .history
 
+.idea/
+*.iml
 
+# Local tool data
+.code-review-graph/
 
 # Flutter repo-specific
 /bin/cache/
