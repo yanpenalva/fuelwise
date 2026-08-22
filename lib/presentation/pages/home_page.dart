@@ -36,6 +36,15 @@ class _HomePageState extends State<HomePage> {
   String? _gasolineConsumptionError;
   String? _ethanolConsumptionError;
   FuelCalculationResult? _result;
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showWelcomeDialog();
+    });
+  }
 
   @override
   void dispose() {
@@ -46,17 +55,60 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  void _showWelcomeDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Bem-vindo ao Fuelwise'),
+          content: const SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: <Widget>[
+                Text(
+                  'Descubra qual combustível compensa mais abastecer hoje.',
+                ),
+                Text('1. Informe o preço do litro da gasolina e do etanol.'),
+                Text(
+                  '2. Opcionalmente, informe quantos km seu carro anda por litro com cada combustível.',
+                ),
+                Text(
+                  '3. Toque em Calcular e veja a recomendação, os custos por km e até quanto o etanol pode custar para valer a pena.',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Entendi'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _selectRule(Set<ComparisonRule> selection) {
     setState(() {
       _rule = selection.first;
     });
   }
 
-  void _submit() {
+  String _parserInput(TextEditingController controller) {
+    return CurrencyInputFormatter.toParserInput(controller.text);
+  }
+
+  Future<void> _submit() async {
+    if (_isSubmitting) {
+      return;
+    }
+
     final FuelInputParseResult gasolinePriceResult =
-        parseRequiredPositiveDecimal(_gasolinePriceController.text);
+        parseRequiredPositiveDecimal(_parserInput(_gasolinePriceController));
     final FuelInputParseResult ethanolPriceResult =
-        parseRequiredPositiveDecimal(_ethanolPriceController.text);
+        parseRequiredPositiveDecimal(_parserInput(_ethanolPriceController));
     final FuelInputParseResult gasolineConsumptionResult =
         parseOptionalPositiveDecimal(_gasolineConsumptionController.text);
     final FuelInputParseResult ethanolConsumptionResult =
@@ -83,6 +135,17 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
+      _isSubmitting = true;
+    });
+
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = false;
       _gasolinePriceError = null;
       _ethanolPriceError = null;
       _gasolineConsumptionError = null;
@@ -155,51 +218,116 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildForm() {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: 16,
-          children: <Widget>[
-            FuelInputField(
-              label: 'Preço da gasolina',
-              controller: _gasolinePriceController,
-              errorText: _gasolinePriceError,
-            ),
-            FuelInputField(
-              label: 'Preço do etanol',
-              controller: _ethanolPriceController,
-              errorText: _ethanolPriceError,
-            ),
-            FuelInputField(
-              label: 'Consumo de gasolina (km/l)',
-              controller: _gasolineConsumptionController,
-              errorText: _gasolineConsumptionError,
-            ),
-            FuelInputField(
-              label: 'Consumo de etanol (km/l)',
-              controller: _ethanolConsumptionController,
-              errorText: _ethanolConsumptionError,
-            ),
-            SegmentedButton<ComparisonRule>(
-              segments: const <ButtonSegment<ComparisonRule>>[
-                ButtonSegment<ComparisonRule>(
-                  value: ComparisonRule.standard,
-                  label: Text('Padrão (0,70)'),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 16,
+            children: <Widget>[
+              Card(
+                elevation: 0,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.local_gas_station,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Compare os preços e descubra qual combustível '
+                          'rende mais para o seu bolso.',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                ButtonSegment<ComparisonRule>(
-                  value: ComparisonRule.custom,
-                  label: Text('Personalizada'),
-                ),
-              ],
-              selected: <ComparisonRule>{_rule},
-              onSelectionChanged: _selectRule,
-            ),
-            FilledButton(
-              onPressed: _submit,
-              child: const Text('Calcular'),
-            ),
-          ],
+              ),
+              FuelInputField(
+                label: 'Preço da gasolina',
+                controller: _gasolinePriceController,
+                errorText: _gasolinePriceError,
+                prefixText: 'R\$ ',
+                hintText: '6,29',
+                useCurrencyMask: true,
+              ),
+              FuelInputField(
+                label: 'Preço do etanol',
+                controller: _ethanolPriceController,
+                errorText: _ethanolPriceError,
+                prefixText: 'R\$ ',
+                hintText: '4,59',
+                useCurrencyMask: true,
+              ),
+              FuelInputField(
+                label: 'Consumo de gasolina',
+                controller: _gasolineConsumptionController,
+                errorText: _gasolineConsumptionError,
+                suffixText: 'L',
+                hintText: 'Ex: 10',
+                helperText: 'Quantos km por litro na gasolina (opcional)',
+              ),
+              FuelInputField(
+                label: 'Consumo de etanol',
+                controller: _ethanolConsumptionController,
+                errorText: _ethanolConsumptionError,
+                suffixText: 'L',
+                hintText: 'Ex: 7',
+                helperText: 'Quantos km por litro no etanol (opcional)',
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: <Widget>[
+                  SegmentedButton<ComparisonRule>(
+                    segments: const <ButtonSegment<ComparisonRule>>[
+                      ButtonSegment<ComparisonRule>(
+                        value: ComparisonRule.standard,
+                        label: Text('Padrão (0,70)'),
+                      ),
+                      ButtonSegment<ComparisonRule>(
+                        value: ComparisonRule.custom,
+                        icon: Icon(Icons.directions_car),
+                        label: Text('Personalizada'),
+                      ),
+                    ],
+                    selected: <ComparisonRule>{_rule},
+                    onSelectionChanged: _selectRule,
+                  ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: _rule == ComparisonRule.custom
+                        ? Text(
+                            'O limiar será calculado pela divisão do consumo '
+                            'do etanol pelo da gasolina informados acima.',
+                            key: const ValueKey<String>('custom-helper'),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+              FilledButton.icon(
+                onPressed: _isSubmitting ? null : _submit,
+                icon: _isSubmitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.calculate),
+                label: Text(_isSubmitting ? 'Calculando...' : 'Calcular'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -207,17 +335,21 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildResult() {
     final FuelCalculationResult result = _result!;
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Expanded(child: ResultView(result: result)),
-          FilledButton(
-            onPressed: _startNewCalculation,
-            child: const Text('Novo cálculo'),
-          ),
-        ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Expanded(child: ResultView(result: result)),
+            const SizedBox(height: 8),
+            FilledButton.tonalIcon(
+              onPressed: _startNewCalculation,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Novo cálculo'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -227,7 +359,16 @@ class _HomePageState extends State<HomePage> {
     final FuelCalculationResult? result = _result;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fuelwise'),
+        title: Row(
+          children: <Widget>[
+            Icon(
+              Icons.local_gas_station,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            const Text('Fuelwise'),
+          ],
+        ),
       ),
       body: result == null ? _buildForm() : _buildResult(),
     );

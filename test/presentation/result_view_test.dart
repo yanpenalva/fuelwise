@@ -108,14 +108,17 @@ void main() {
   );
 
   testWidgets(
-    'shows maximum recommended ethanol price',
+    'shows the max-price insight sentence',
     (WidgetTester tester) async {
       await _pumpResultView(
         tester,
         _result(maximumEthanolPrice: Decimal.parse('4.50')),
       );
 
-      expect(find.text('R\$ 4,50'), findsOneWidget);
+      expect(
+        find.textContaining('o etanol compensa até R\$ 4,50 por litro'),
+        findsOneWidget,
+      );
     },
   );
 

@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:fuelwise/domain/fuel_input_parser.dart';
@@ -9,8 +8,8 @@ import 'package:fuelwise/presentation/widgets/result_view.dart';
 
 const String _gasolinePriceLabel = 'Preço da gasolina';
 const String _ethanolPriceLabel = 'Preço do etanol';
-const String _gasolineConsumptionLabel = 'Consumo de gasolina (km/l)';
-const String _ethanolConsumptionLabel = 'Consumo de etanol (km/l)';
+const String _gasolineConsumptionLabel = 'Consumo de gasolina';
+const String _ethanolConsumptionLabel = 'Consumo de etanol';
 const String _submitButton = 'Calcular';
 const String _newCalculationButton = 'Novo cálculo';
 const String _standardRuleSegment = 'Padrão (0,70)';
@@ -18,6 +17,12 @@ const String _customRuleSegment = 'Personalizada';
 
 Future<void> _pumpApp(WidgetTester tester) async {
   await tester.pumpWidget(const FuelwiseApp());
+  await tester.pump();
+
+  if (find.byType(AlertDialog).evaluate().isNotEmpty) {
+    await tester.tap(find.text('Entendi'));
+    await tester.pump();
+  }
 }
 
 Future<void> _enterPrice(
@@ -29,8 +34,11 @@ Future<void> _enterPrice(
 }
 
 Future<void> _submit(WidgetTester tester) async {
-  await tester.tap(find.text(_submitButton));
+  await tester.ensureVisible(find.text(_submitButton));
   await tester.pump();
+  await tester.tap(find.text(_submitButton), warnIfMissed: false);
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 600));
 }
 
 void main() {
@@ -94,7 +102,8 @@ void main() {
     (WidgetTester tester) async {
       await _pumpApp(tester);
 
-      await _submit(tester);
+      await tester.tap(find.text(_submitButton), warnIfMissed: false);
+      await tester.pump();
 
       expect(find.text(FuelInputMessages.required), findsNWidgets(2));
       expect(find.byType(ResultView), findsNothing);
@@ -103,14 +112,15 @@ void main() {
   );
 
   testWidgets(
-    'shows invalid number error when price contains only comma',
+    'shows greater-than-zero error when a price is zero',
     (WidgetTester tester) async {
       await _pumpApp(tester);
 
-      await _enterPrice(tester, _gasolinePriceLabel, ',');
-      await _submit(tester);
+      await _enterPrice(tester, _gasolinePriceLabel, '0');
+      await tester.tap(find.text(_submitButton), warnIfMissed: false);
+      await tester.pump();
 
-      expect(find.text(FuelInputMessages.invalidNumber), findsOneWidget);
+      expect(find.text(FuelInputMessages.greaterThanZero), findsOneWidget);
       expect(find.byType(ResultView), findsNothing);
     },
   );

@@ -14,69 +14,156 @@ class ResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 16,
           children: <Widget>[
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
-                color: _recommendationColor(result.recommendedFuel),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                _recommendationText(result.recommendedFuel),
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[
+                    _recommendationColor(result.recommendedFuel),
+                    Color.lerp(
+                      _recommendationColor(result.recommendedFuel),
+                      Colors.black,
+                      0.25,
+                    )!,
+                  ],
                 ),
-                textAlign: TextAlign.center,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color:
+                        _recommendationColor(result.recommendedFuel).withAlpha(70),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            Card(
               child: Column(
                 children: <Widget>[
-                  _metricTile(
-                    'Proporção etanol/gasolina',
-                    _formatRatio(result.ratio),
+                  Icon(
+                    result.recommendedFuel == FuelType.ethanol
+                        ? Icons.eco
+                        : Icons.local_gas_station,
+                    color: Colors.white,
+                    size: 40,
                   ),
-                  _metricTile(
-                    'Limiar aplicado',
-                    _formatRatio(result.appliedThreshold),
+                  const SizedBox(height: 8),
+                  Text(
+                    _fuelName(result.recommendedFuel),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white70,
+                      letterSpacing: 2,
+                    ),
                   ),
-                  _metricTile(
-                    'Fonte da regra',
-                    _thresholdLabel(result.thresholdSource),
-                  ),
-                  _metricTile(
-                    'Diferença',
-                    _formatRatio(result.difference),
+                  Text(
+                    _recommendationText(result.recommendedFuel),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
             Card(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  _costPerKmTile(
-                    'Custo por km — gasolina',
-                    result.gasolineCostPerKilometer,
-                  ),
-                  _costPerKmTile(
-                    'Custo por km — etanol',
-                    result.ethanolCostPerKilometer,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: Text(
+                      'Comparação',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   _metricTile(
-                    'Preço máximo recomendado do etanol',
-                    'R\$ ${_formatMoney(result.maximumEthanolPrice)}',
+                    icon: Icons.percent,
+                    label: 'Proporção etanol/gasolina',
+                    value: _formatRatio(result.ratio),
+                  ),
+                  _metricTile(
+                    icon: Icons.rule,
+                    label: 'Limiar aplicado',
+                    value: _formatRatio(result.appliedThreshold),
+                  ),
+                  _metricTile(
+                    icon: Icons.source_outlined,
+                    label: 'Fonte da regra',
+                    value: _thresholdLabel(result.thresholdSource),
+                  ),
+                  _metricTile(
+                    icon: result.difference >= Decimal.zero
+                        ? Icons.trending_up
+                        : Icons.trending_down,
+                    label: 'Diferença',
+                    value: _formatRatio(result.difference),
+                    valueColor: _differenceColor(context, result.difference),
                   ),
                 ],
+              ),
+            ),
+            Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: Text(
+                      'Custos',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  _costPerKmTile(
+                    label: 'Custo por km — gasolina',
+                    costPerKilometer: result.gasolineCostPerKilometer,
+                  ),
+                  _costPerKmTile(
+                    label: 'Custo por km — etanol',
+                    costPerKilometer: result.ethanolCostPerKilometer,
+                  ),
+                ],
+              ),
+            ),
+            Card(
+              elevation: 0,
+              color: colorScheme.secondaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(Icons.lightbulb_outline, color: colorScheme.primary),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Com o preço atual da gasolina, o etanol compensa '
+                        'até R\$ ${_formatMoney(result.maximumEthanolPrice)} '
+                        'por litro.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -85,32 +172,47 @@ class ResultView extends StatelessWidget {
     );
   }
 
-  Widget _metricTile(String label, String value) {
+  Widget _metricTile({
+    required IconData icon,
+    required String label,
+    required String value,
+    Color? valueColor,
+  }) {
     return ListTile(
+      leading: Icon(icon),
       title: Text(label),
       subtitle: Text(
         value,
-        style: const TextStyle(fontWeight: FontWeight.w600),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+          color: valueColor,
+        ),
       ),
     );
   }
 
-  Widget _costPerKmTile(
-    String label,
-    Decimal? costPerKilometer,
-  ) {
+  Widget _costPerKmTile({
+    required String label,
+    required Decimal? costPerKilometer,
+  }) {
     if (costPerKilometer == null) {
       return ListTile(
+        leading: const Icon(Icons.info_outline),
         title: Text(label),
         subtitle: const Text('Indisponível — informe os dois consumos'),
       );
     }
 
     return ListTile(
+      leading: const Icon(Icons.savings_outlined),
       title: Text(label),
       subtitle: Text(
         'R\$ ${_formatMoney(costPerKilometer)}',
-        style: const TextStyle(fontWeight: FontWeight.w600),
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+        ),
       ),
     );
   }
@@ -152,6 +254,21 @@ class ResultView extends StatelessWidget {
       FuelType.ethanol => 'Abasteça com etanol',
       FuelType.gasoline => 'Abasteça com gasolina',
     };
+  }
+
+  String _fuelName(FuelType fuel) {
+    return switch (fuel) {
+      FuelType.ethanol => 'ETANOL',
+      FuelType.gasoline => 'GASOLINA',
+    };
+  }
+
+  Color _differenceColor(BuildContext context, Decimal difference) {
+    if (difference >= Decimal.zero) {
+      return Colors.green.shade700;
+    }
+
+    return Colors.deepOrange.shade700;
   }
 
   Color _recommendationColor(FuelType fuel) {
