@@ -92,7 +92,10 @@ class ResultView extends StatelessWidget {
   Widget _metricTile(String label, String value) {
     return ListTile(
       title: Text(label),
-      trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: Text(
+        value,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
     );
   }
 
@@ -110,7 +113,7 @@ class ResultView extends StatelessWidget {
 
     return ListTile(
       title: Text(label),
-      trailing: Text(
+      subtitle: Text(
         'R\$ ${moneyFormat.format(costPerKilometer.toDouble())}',
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),

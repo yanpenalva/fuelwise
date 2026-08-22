@@ -49,7 +49,7 @@ RUN mkdir -p /workdir && \
 
 USER dev
 
-RUN mkdir -p ${PUB_CACHE}/_temp && \
+RUN mkdir -p ${PUB_CACHE}/_temp /home/dev/.android && \
     flutter --version || true && \
     flutter config --no-analytics || true && \
     dart --disable-analytics || true
