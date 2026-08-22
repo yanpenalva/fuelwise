@@ -44,6 +44,7 @@ All commands run from the repository root. Nothing depends on host SDK state.
 | `docker compose run --rm dev flutter analyze` | Static analysis |
 | `docker compose run --rm dev flutter test` | Run all tests |
 | `docker compose run --rm dev flutter test test/<file>.dart` | Run one test file |
+| `docker compose run --rm dev dart run build_runner build --delete-conflicting-outputs` | Generate Drift/build_runner code (V1+) |
 | `docker compose run --rm dev flutter build apk --debug` | Build debug APK |
 | `docker compose run --rm dev bash` | Interactive shell inside the container |
 | `docker compose down` | Stop/remove containers (keeps caches) |

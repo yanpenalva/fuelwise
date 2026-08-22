@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'application/preferences/app_preferences_controller.dart';
+import 'infrastructure/preferences/shared_preferences_app_preferences.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/theme/app_theme.dart';
 
 void main() {
-  runApp(const FuelwiseApp());
+  runApp(
+    ProviderScope(
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(
+          SharedPreferencesAppPreferences(),
+        ),
+      ],
+      child: const FuelwiseApp(),
+    ),
+  );
 }
 
 class FuelwiseApp extends StatelessWidget {

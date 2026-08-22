@@ -1,6 +1,9 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../application/preferences/app_preferences_controller.dart';
+import '../../application/preferences/app_preferences_data.dart';
 import '../../domain/fuel_calculation_input.dart';
 import '../../domain/fuel_calculator.dart';
 import '../../domain/fuel_calculation_result.dart';
@@ -13,14 +16,14 @@ import '../widgets/result_view.dart';
 
 enum ComparisonRule { standard, custom }
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final TextEditingController _gasolinePriceController =
       TextEditingController();
   final TextEditingController _ethanolPriceController =
@@ -37,14 +40,7 @@ class _HomePageState extends State<HomePage> {
   String? _ethanolConsumptionError;
   FuelCalculationResult? _result;
   bool _isSubmitting = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showWelcomeDialog();
-    });
-  }
+  bool _welcomeDialogShown = false;
 
   @override
   void dispose() {
@@ -55,8 +51,26 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _showWelcomeDialog() {
-    showDialog<void>(
+  void _maybeShowWelcomeDialog() {
+    final AsyncValue<AppPreferencesData> preferences =
+        ref.watch(appPreferencesProvider);
+
+    final AppPreferencesData? data = preferences.value;
+    if (data == null || data.hasSeenWelcome || _welcomeDialogShown) {
+      return;
+    }
+
+    _welcomeDialogShown = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _showWelcomeDialog();
+    });
+  }
+
+  Future<void> _showWelcomeDialog() async {
+    await showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
@@ -88,6 +102,8 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+
+    await ref.read(appPreferencesProvider.notifier).markWelcomeSeen();
   }
 
   void _selectRule(Set<ComparisonRule> selection) {
@@ -356,6 +372,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _maybeShowWelcomeDialog();
     final FuelCalculationResult? result = _result;
     return Scaffold(
       appBar: AppBar(

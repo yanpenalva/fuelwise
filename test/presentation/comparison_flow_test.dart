@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:fuelwise/application/preferences/app_preferences_controller.dart';
+import 'package:fuelwise/application/preferences/app_preferences_data.dart';
+import 'package:fuelwise/application/preferences/rule_mode.dart';
 import 'package:fuelwise/domain/fuel_input_parser.dart';
 import 'package:fuelwise/main.dart';
 import 'package:fuelwise/presentation/widgets/fuel_input_field.dart';
 import 'package:fuelwise/presentation/widgets/result_view.dart';
+
+import '../helpers/fake_app_preferences.dart';
 
 const String _gasolinePriceLabel = 'Preço da gasolina';
 const String _ethanolPriceLabel = 'Preço do etanol';
@@ -16,13 +22,22 @@ const String _standardRuleSegment = 'Padrão (0,70)';
 const String _customRuleSegment = 'Personalizada';
 
 Future<void> _pumpApp(WidgetTester tester) async {
-  await tester.pumpWidget(const FuelwiseApp());
-  await tester.pump();
-
-  if (find.byType(AlertDialog).evaluate().isNotEmpty) {
-    await tester.tap(find.text('Entendi'));
-    await tester.pump();
-  }
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(
+          FakeAppPreferences(
+            initial: const AppPreferencesData(
+              hasSeenWelcome: true,
+              ruleMode: RuleMode.standard,
+            ),
+          ),
+        ),
+      ],
+      child: const FuelwiseApp(),
+    ),
+  );
+  await tester.pumpAndSettle();
 }
 
 Future<void> _enterPrice(
