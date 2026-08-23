@@ -30,8 +30,9 @@ void main() {
         calculationHistoryRepositoryProvider.overrideWithValue(
           DriftCalculationHistoryRepository(database),
         ),
-        historyExportServiceProvider
-            .overrideWithValue(DartHistoryExportService()),
+        historyExportServiceProvider.overrideWithValue(
+          DartHistoryExportService(),
+        ),
       ],
       child: const FuelwiseApp(),
     ),
@@ -53,7 +54,7 @@ class FuelwiseApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeModePreference preference =
         ref.watch(appPreferencesProvider).value?.themeMode ??
-            ThemeModePreference.system;
+        ThemeModePreference.system;
 
     return MaterialApp(
       title: 'Fuelwise',
@@ -65,19 +66,16 @@ class FuelwiseApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('pt', 'BR'),
-      ],
-      localeResolutionCallback: (
-        Locale? deviceLocale,
-        Iterable<Locale> supportedLocales,
-      ) {
-        if (deviceLocale != null && supportedLocales.contains(deviceLocale)) {
-          return deviceLocale;
-        }
+      supportedLocales: const [Locale('pt', 'BR')],
+      localeResolutionCallback:
+          (Locale? deviceLocale, Iterable<Locale> supportedLocales) {
+            if (deviceLocale != null &&
+                supportedLocales.contains(deviceLocale)) {
+              return deviceLocale;
+            }
 
-        return const Locale('pt', 'BR');
-      },
+            return const Locale('pt', 'BR');
+          },
       home: const HomePage(),
     );
   }
