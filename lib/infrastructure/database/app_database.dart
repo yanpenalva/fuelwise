@@ -15,7 +15,8 @@ class AppDatabase extends _$AppDatabase {
 
   Future<VehicleProfileRow?> getVehicleProfile() {
     return (select(vehicleProfiles)
-          ..orderBy([(t) => OrderingTerm(expression: t.id)]))
+          ..orderBy([(t) => OrderingTerm(expression: t.id)])
+          ..limit(1))
         .getSingleOrNull();
   }
 
