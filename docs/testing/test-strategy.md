@@ -11,8 +11,9 @@
 
 - Unit tests for calculation and validation.
 - Widget tests for screens and forms.
-- Persistence tests for Drift and preferences.
-- Lightweight integration tests with replaceable dependencies.
+- Persistence tests for Drift and preferences (in-memory database, decimal text round-trip, UTC instants, schema v1 pin, malformed-value fallbacks).
+- Integration tests with replaceable dependencies (in-memory Drift over the real repositories through the UI: one history entry per calculation, profile prefill after restart, explicit profile save).
+- On-device smoke validation of the complete offline flow via host ADB (calculation, history, profile, airplane mode, dark mode, rotation).
 
 ## Priorities
 

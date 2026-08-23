@@ -79,3 +79,60 @@ Wave 4 opened 2026-08-22 immediately after retroactive cross-review of waves 1�
 - Open MINOR backlog (user decides): drift `dateTime` epoch-seconds representation (reads back local-time DateTime; consider `store_date_time_values_as_text` before schema v2), sqlcipher EOL transitive dep audit, `requireValue` race guards in preferences controller, side-effect-in-build welcome dialog trigger, `rule_mode.dart` placement vs infrastructure mapping rule, profile load-error silent blank form, history controller read-modify-write state races, duplicate car icon semantics, unused-import lint verification.
 
 Next concrete actions: implement V1-012 → V1-013 → V1-014 code steps, then APK build + device smoke, then wrap up.
+
+---
+
+## Execution record
+
+### V1-012 — UX (commit 6de6bff)
+
+- `home_page.dart`: profile prefill now writes pt-BR comma decimals; `HistorySaveStatus` switch made exhaustive (no wildcard).
+- New user requirement, committed bf57793: consumption fields accept **dot or comma** as decimal separator with on-the-fly formatting via new `DecimalInputFormatter` (`lib/presentation/widgets/fuel_input_field.dart`). Normalizes `.` → `,`, keeps a single separator, prefixes `0` for leading separators, strips invalid chars. Applied to home consumption fields and profile form (profile page previously had no formatter). Unit tests in `test/presentation/decimal_input_formatter_test.dart`. Regression: replaced obsolete "negative consumption" widget test (minus now untypeable) with stripping test.
+
+### V1-013 — persistence hardening (commit 8f7c139)
+
+- New `test/infrastructure/database/vehicle_profile_mapper_test.dart`: comma normalization (`12,5`), ambiguous `1,234`, nulls, malformed → typed exception.
+- `shared_preferences_app_preferences_test.dart`: `-1` and `0` threshold fallback → null; wrong-typed welcome flag → unseen; fake `getBool` now mimics platform type filtering.
+- `app_database_test.dart`: schema v1 pin guard.
+- `history_controller_test.dart`: fake entries converted to `isUtc: true`.
+
+### V1-014 — full flow, regression, device validation
+
+- Integration suite `test/integration/full_flow_test.dart` (commit 7f2739c, adjusted 6de6bff): real in-memory Drift through the UI — one entry per valid calculation (2 calculations → 2 entries, newest first), prefill after restart, explicit profile save without blocking calculation.
+- Gate after each step: container `flutter analyze` clean; full suite **161/161**.
+
+### CRITICAL bug found by device smoke (commit 15ea7e4)
+
+- `lib/main.dart` wired only the preferences repository. `vehicleProfileRepositoryProvider` and `calculationHistoryRepositoryProvider` defaulted to `UnimplementedError()` in production (only tests overrode them) → history saves and profile persistence failed **only on device**; no `fuelwise.sqlite` created; container tests all green because they override providers. This was invisible to the suite.
+- Fix: `main()` composes both Drift repositories over a single `AppDatabase` (`driftDatabase(name: 'fuelwise')`).
+- Lesson (recorded for future waves): end-to-end composition-root wiring must be exercised by at least one test that builds the real app without test overrides, or validated on device before claiming a wave complete.
+
+### Device smoke — Moto G35 5G (`ZF525GVCTR`), host ADB, 2026-08-23
+
+Build: `docker compose run --rm dev flutter build apk --debug`; install `adb install -r` (data preserved). Results:
+
+| Check | Result |
+|---|---|
+| Welcome dialog only on first launch | PASS — never reappeared across cold restarts (flag persisted) |
+| Valid calculation → history entry | PASS — "Salvo no histórico."; DB file `app_flutter/fuelwise.sqlite` created |
+| History lists snapshot | PASS — date, recommendation, prices, ratio, threshold label, newest first (3 entries across restarts) |
+| Delete with confirmation | PASS — dialog "Excluir este registro?" / "Esta ação não pode ser desfeita." / Cancelar preserved entry; Excluir removed it, list refreshed live ("Nenhum cálculo salvo ainda.") |
+| Profile save + prefill | PASS — name + "10,5" saved; after cold start consumption field prefilled "10,5" and cost per km computed (R$ 0,60 = 6,29/10,5) |
+| Footer | PASS — "v1.0.0 · 22/08/2026 · yanpenalva" rendered |
+| Airplane mode (offline end-to-end) | PASS — calculation + history save succeeded with airplane mode on |
+| Dark mode follows system | PASS — pixel-verified: light RGB ~(247,251,241) vs dark ~(16,20,15) via `cmd uimode night` |
+| Rotation | PASS — landscape 2400x1080, result + history screens render, no RenderFlex overflow in logcat |
+| Decimal input (new feature) | PASS — "10,5" typed with comma on device, masked correctly |
+| Currency mask | PASS — R\$ 6,29 / R\$ 4,59 entered via digits |
+
+Smoke drove the UI blind via uiautomator bounds + `adb input` (screenshots captured but not readable by the agent model); all assertions verified through UI dumps and pixel sampling.
+
+### Wrap up
+
+- `docs/testing/test-strategy.md` updated (test layers + on-device smoke).
+- Wave 4 was executed without a `progress.md` at the user's request to keep flow linear; all state recorded here.
+- Remaining open user decisions: manual dark-mode toggle (own wave), MINOR backlog above.
+
+## Versioned Handoff (final)
+
+Wave 4 complete 2026-08-23. All V1 doc tasks V1-012, V1-013, V1-014 met. Next candidate product wave: manual dark-mode toggle persisted via preferences (user decision). Prior to any further on-device work, restart the opencode server so cavecrew reviewer/investigator pick up `opencode/big-pickle` (frontmatter already fixed; server cache is the blocker).
