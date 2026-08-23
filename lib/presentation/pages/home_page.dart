@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -57,7 +59,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       if (!mounted) {
         return;
       }
-      _showWelcomeDialog();
+      unawaited(_showWelcomeDialog());
     });
   }
 
@@ -95,7 +97,14 @@ class _HomePageState extends ConsumerState<HomePage> {
       },
     );
 
-    await ref.read(appPreferencesProvider.notifier).markWelcomeSeen();
+    try {
+      await ref.read(appPreferencesProvider.notifier).markWelcomeSeen();
+    } catch (_) {
+      _showSnackbar(
+        'Não foi possível lembrar desta mensagem no próximo acesso.',
+        error: true,
+      );
+    }
   }
 
   void _prefillFromProfile(VehicleProfile profile) {

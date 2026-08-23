@@ -65,13 +65,10 @@ class _ProfileFormState extends ConsumerState<_ProfileForm> {
   }
 
   static String? _consumptionError(String raw, Decimal? parsed) {
-    if (raw.trim().isEmpty) {
+    if (raw.trim().isEmpty || parsed != null) {
       return null;
     }
-    if (parsed == null || parsed <= Decimal.zero) {
-      return 'Informe um valor maior que zero.';
-    }
-    return null;
+    return 'Informe um valor maior que zero.';
   }
 
   @override
@@ -91,14 +88,34 @@ class _ProfileFormState extends ConsumerState<_ProfileForm> {
     final Decimal? gasoline = _parseConsumption(_gasolineController.text);
     final Decimal? ethanol = _parseConsumption(_ethanolController.text);
 
-    final String? nameError =
-        name.isEmpty ? 'Informe o nome do veículo.' : null;
-    final String? gasolineError =
+    String? nameError;
+    String? gasolineError =
         _consumptionError(_gasolineController.text, gasoline);
-    final String? ethanolError =
+    String? ethanolError =
         _consumptionError(_ethanolController.text, ethanol);
 
-    if (nameError != null ||
+    VehicleProfile? profile;
+    try {
+      profile = VehicleProfile(
+        name: name,
+        gasolineKmPerLiter: gasoline,
+        ethanolKmPerLiter: ethanol,
+      );
+    } on ArgumentError catch (error) {
+      final String argumentName = '${error.name}';
+      if (argumentName == 'name') {
+        nameError = 'Informe o nome do veículo.';
+      }
+      if (argumentName == 'gasolineKmPerLiter') {
+        gasolineError ??= 'Informe um valor maior que zero.';
+      }
+      if (argumentName == 'ethanolKmPerLiter') {
+        ethanolError ??= 'Informe um valor maior que zero.';
+      }
+    }
+
+    if (profile == null ||
+        nameError != null ||
         gasolineError != null ||
         ethanolError != null) {
       setState(() {
@@ -114,13 +131,7 @@ class _ProfileFormState extends ConsumerState<_ProfileForm> {
     });
 
     try {
-      await ref.read(vehicleProfileProvider.notifier).save(
-            VehicleProfile(
-              name: name,
-              gasolineKmPerLiter: gasoline,
-              ethanolKmPerLiter: ethanol,
-            ),
-          );
+      await ref.read(vehicleProfileProvider.notifier).save(profile);
     } catch (_) {
       if (!mounted) {
         return;
