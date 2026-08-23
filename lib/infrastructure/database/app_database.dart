@@ -39,4 +39,17 @@ class AppDatabase extends _$AppDatabase {
     return await (select(historyEntries)..where((t) => t.id.equals(id)))
         .getSingle();
   }
+
+  Future<List<HistoryEntryRow>> getAllHistoryEntries() {
+    return (select(historyEntries)
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+            (t) => OrderingTerm(expression: t.id, mode: OrderingMode.desc),
+          ]))
+        .get();
+  }
+
+  Future<int> deleteHistoryEntry(int id) {
+    return (delete(historyEntries)..where((t) => t.id.equals(id))).go();
+  }
 }

@@ -11,7 +11,7 @@ Location: `lib/domain/`. The domain has no dependency on Flutter, Riverpod, Drif
 - `FuelCalculationInput` — `fuel_calculation_input.dart`
 - `FuelCalculationResult` — `fuel_calculation_result.dart`
 - `VehicleProfile` — `vehicle_profile.dart`: single vehicle profile with a trimmed non-empty name and two optional consumption values (each null or greater than zero; both may be absent, unlike `VehicleEfficiency`). Immutable, with null-preserving `copyWith`.
-- `CalculationHistoryEntry` — NOT FOUND (V1, persistence phase)
+- `CalculationHistoryEntry` — `calculation_history_entry.dart`: immutable snapshot of one calculation (prices, optional consumptions, recommendation, ratio, applied threshold and source, costs per km, maximum ethanol price, difference) plus storage id and UTC creation date.
 
 All numeric fields use `Decimal` (ADR-002). Value objects validate their invariants in constructors: prices and consumption values must be greater than zero; efficiency requires at least one consumption value. `FuelCalculationInput.ratio` is an exact `Rational`; `applyCustomThreshold` decouples cost calculation (always derived from available consumption) from the user's threshold rule choice.
 
