@@ -9,9 +9,7 @@ import '../../application/preferences/app_preferences_controller.dart';
 import '../../application/preferences/app_preferences_data.dart';
 import '../../application/preferences/rule_mode.dart';
 import '../../application/preferences/theme_mode_preference.dart';
-import '../../application/profile/vehicle_profile_controller.dart';
 import '../../domain/fuel_calculation_result.dart';
-import '../../domain/vehicle_profile.dart';
 import '../release/app_release.dart';
 import '../widgets/fuel_input_field.dart';
 import '../widgets/result_view.dart';
@@ -121,19 +119,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         'Não foi possível lembrar desta mensagem no próximo acesso.',
         error: true,
       );
-    }
-  }
-
-  void _prefillFromProfile(VehicleProfile profile) {
-    if (_gasolineConsumptionController.text.isEmpty &&
-        profile.gasolineKmPerLiter != null) {
-      _gasolineConsumptionController.text =
-          profile.gasolineKmPerLiter!.toString().replaceAll('.', ',');
-    }
-    if (_ethanolConsumptionController.text.isEmpty &&
-        profile.ethanolKmPerLiter != null) {
-      _ethanolConsumptionController.text =
-          profile.ethanolKmPerLiter!.toString().replaceAll('.', ',');
     }
   }
 
@@ -421,20 +406,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     final ComparisonFormState form = ref.watch(comparisonFormProvider);
     final RuleMode ruleMode =
         ref.watch(appPreferencesProvider).value?.ruleMode ?? RuleMode.standard;
-
-    ref.listen<AsyncValue<VehicleProfile?>>(
-      vehicleProfileProvider,
-      (
-        AsyncValue<VehicleProfile?>? previous,
-        AsyncValue<VehicleProfile?> next,
-      ) {
-        final VehicleProfile? profile = next.value;
-        if (profile == null) {
-          return;
-        }
-        _prefillFromProfile(profile);
-      },
-    );
 
     ref.listen<ComparisonFormState>(
       comparisonFormProvider,

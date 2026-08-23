@@ -114,7 +114,7 @@ void main() {
   );
 
   testWidgets(
-    'prefills consumption fields from persisted profile after restart',
+    'starts with empty consumption fields despite a persisted profile',
     (tester) async {
       final profileRepository = DriftVehicleProfileRepository(database);
       await profileRepository.save(
@@ -134,8 +134,8 @@ void main() {
         find.widgetWithText(FuelInputField, 'Consumo de etanol'),
       );
 
-      expect(gasolineField.controller.text, '10,5');
-      expect(ethanolField.controller.text, '7');
+      expect(gasolineField.controller.text, isEmpty);
+      expect(ethanolField.controller.text, isEmpty);
 
       await _calculate(tester, gasolinePrice: '6,00', ethanolPrice: '4,19');
       expect(find.byType(ResultView), findsOneWidget);

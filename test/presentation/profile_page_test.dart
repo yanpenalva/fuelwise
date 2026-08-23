@@ -25,6 +25,23 @@ final class _FakeVehicleProfileRepository implements VehicleProfileRepository {
   }
 }
 
+final class _RetryVehicleProfileRepository implements VehicleProfileRepository {
+  bool failLoad = true;
+
+  @override
+  Future<VehicleProfile?> load() async {
+    if (failLoad) {
+      throw Exception('load failed');
+    }
+    return null;
+  }
+
+  @override
+  Future<VehicleProfile> save(VehicleProfile profile) async {
+    throw UnimplementedError();
+  }
+}
+
 Future<void> _pumpProfilePage(
   WidgetTester tester,
   VehicleProfileRepository repository,
@@ -40,6 +57,23 @@ Future<void> _pumpProfilePage(
 }
 
 void main() {
+  testWidgets('shows load error with retry that recovers', (tester) async {
+    final _RetryVehicleProfileRepository repository =
+        _RetryVehicleProfileRepository();
+
+    await _pumpProfilePage(tester, repository);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Não foi possível carregar seu perfil.'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNothing);
+
+    repository.failLoad = false;
+    await tester.tap(find.text('Tentar novamente'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Não foi possível carregar seu perfil.'), findsNothing);
+    expect(find.byType(TextFormField), findsNWidgets(3));
+  });
   testWidgets('saves valid profile', (tester) async {
     final _FakeVehicleProfileRepository repository =
         _FakeVehicleProfileRepository();

@@ -19,9 +19,29 @@ class ProfilePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Meu veículo'),
       ),
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _ProfileForm(initialProfile: state.value),
+      body: switch (state) {
+        AsyncLoading<VehicleProfile?>() =>
+          const Center(child: CircularProgressIndicator()),
+        AsyncError<VehicleProfile?>() => _buildLoadError(context, ref),
+        AsyncData<VehicleProfile?>() =>
+          _ProfileForm(initialProfile: state.value),
+      },
+    );
+  }
+
+  Widget _buildLoadError(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 16,
+        children: <Widget>[
+          const Text('Não foi possível carregar seu perfil.'),
+          FilledButton(
+            onPressed: () => ref.invalidate(vehicleProfileProvider),
+            child: const Text('Tentar novamente'),
+          ),
+        ],
+      ),
     );
   }
 }
