@@ -11,6 +11,7 @@ import '../../domain/fuel_input_parser.dart';
 import '../../domain/fuel_price.dart';
 import '../../domain/fuel_type.dart';
 import '../../domain/vehicle_efficiency.dart';
+import '../release/app_release.dart';
 import '../widgets/fuel_input_field.dart';
 import '../widgets/result_view.dart';
 
@@ -341,6 +342,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                       )
                     : const Icon(Icons.calculate),
                 label: Text(_isSubmitting ? 'Calculando...' : 'Calcular'),
+              ),
+              Center(
+                child: Text(
+                  AppRelease.label,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
               ),
             ],
           ),
