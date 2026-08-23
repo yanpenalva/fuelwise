@@ -1,21 +1,19 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../application/comparison/comparison_form_controller.dart';
+import '../../application/comparison/comparison_form_state.dart';
 import '../../application/preferences/app_preferences_controller.dart';
 import '../../application/preferences/app_preferences_data.dart';
-import '../../domain/fuel_calculation_input.dart';
-import '../../domain/fuel_calculator.dart';
+import '../../application/preferences/rule_mode.dart';
+import '../../application/profile/vehicle_profile_controller.dart';
 import '../../domain/fuel_calculation_result.dart';
-import '../../domain/fuel_input_parser.dart';
-import '../../domain/fuel_price.dart';
-import '../../domain/fuel_type.dart';
-import '../../domain/vehicle_efficiency.dart';
+import '../../domain/vehicle_profile.dart';
 import '../release/app_release.dart';
 import '../widgets/fuel_input_field.dart';
 import '../widgets/result_view.dart';
-
-enum ComparisonRule { standard, custom }
+import 'history_page.dart';
+import 'profile_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -34,13 +32,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   final TextEditingController _ethanolConsumptionController =
       TextEditingController();
 
-  ComparisonRule _rule = ComparisonRule.standard;
-  String? _gasolinePriceError;
-  String? _ethanolPriceError;
-  String? _gasolineConsumptionError;
-  String? _ethanolConsumptionError;
-  FuelCalculationResult? _result;
-  bool _isSubmitting = false;
   bool _welcomeDialogShown = false;
 
   @override
@@ -107,133 +98,73 @@ class _HomePageState extends ConsumerState<HomePage> {
     await ref.read(appPreferencesProvider.notifier).markWelcomeSeen();
   }
 
-  void _selectRule(Set<ComparisonRule> selection) {
-    setState(() {
-      _rule = selection.first;
-    });
+  void _prefillFromProfile(VehicleProfile profile) {
+    if (_gasolineConsumptionController.text.isEmpty &&
+        profile.gasolineKmPerLiter != null) {
+      _gasolineConsumptionController.text =
+          profile.gasolineKmPerLiter!.toString();
+    }
+    if (_ethanolConsumptionController.text.isEmpty &&
+        profile.ethanolKmPerLiter != null) {
+      _ethanolConsumptionController.text =
+          profile.ethanolKmPerLiter!.toString();
+    }
   }
 
-  String _parserInput(TextEditingController controller) {
-    return CurrencyInputFormatter.toParserInput(controller.text);
+  void _onFormStateChanged(
+    ComparisonFormState? previous,
+    ComparisonFormState next,
+  ) {
+    final HistorySaveStatus previousStatus =
+        previous?.historySave ?? const HistorySaveIdle();
+    final HistorySaveStatus status = next.historySave;
+
+    if (status is HistorySaveFailure && previousStatus is! HistorySaveFailure) {
+      _showSnackbar(status.message, error: true);
+    }
   }
 
-  Future<void> _submit() async {
-    if (_isSubmitting) {
-      return;
-    }
-
-    final FuelInputParseResult gasolinePriceResult =
-        parseRequiredPositiveDecimal(_parserInput(_gasolinePriceController));
-    final FuelInputParseResult ethanolPriceResult =
-        parseRequiredPositiveDecimal(_parserInput(_ethanolPriceController));
-    final FuelInputParseResult gasolineConsumptionResult =
-        parseOptionalPositiveDecimal(_gasolineConsumptionController.text);
-    final FuelInputParseResult ethanolConsumptionResult =
-        parseOptionalPositiveDecimal(_ethanolConsumptionController.text);
-
-    final String? gasolinePriceError = _errorMessage(gasolinePriceResult);
-    final String? ethanolPriceError = _errorMessage(ethanolPriceResult);
-    final String? gasolineConsumptionError =
-        _errorMessage(gasolineConsumptionResult);
-    final String? ethanolConsumptionError =
-        _errorMessage(ethanolConsumptionResult);
-
-    if (gasolinePriceError != null ||
-        ethanolPriceError != null ||
-        gasolineConsumptionError != null ||
-        ethanolConsumptionError != null) {
-      setState(() {
-        _gasolinePriceError = gasolinePriceError;
-        _ethanolPriceError = ethanolPriceError;
-        _gasolineConsumptionError = gasolineConsumptionError;
-        _ethanolConsumptionError = ethanolConsumptionError;
-      });
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-
+  void _showSnackbar(String message, {required bool error}) {
     if (!mounted) {
       return;
     }
-
-    setState(() {
-      _isSubmitting = false;
-      _gasolinePriceError = null;
-      _ethanolPriceError = null;
-      _gasolineConsumptionError = null;
-      _ethanolConsumptionError = null;
-      _result = const FuelCalculator().calculate(
-        FuelCalculationInput(
-          gasolinePrice: FuelPrice(
-            type: FuelType.gasoline,
-            value: _successValue(gasolinePriceResult)!,
-          ),
-          ethanolPrice: FuelPrice(
-            type: FuelType.ethanol,
-            value: _successValue(ethanolPriceResult)!,
-          ),
-          efficiency: _buildEfficiency(
-            gasolineConsumptionResult,
-            ethanolConsumptionResult,
-          ),
-          applyCustomThreshold: _rule == ComparisonRule.custom,
-        ),
-      );
-    });
-  }
-
-  VehicleEfficiency? _buildEfficiency(
-    FuelInputParseResult gasolineConsumptionResult,
-    FuelInputParseResult ethanolConsumptionResult,
-  ) {
-    final Decimal? gasolineConsumption = _successValue(gasolineConsumptionResult);
-    final Decimal? ethanolConsumption = _successValue(ethanolConsumptionResult);
-
-    if (gasolineConsumption == null && ethanolConsumption == null) {
-      return null;
-    }
-
-    return VehicleEfficiency(
-      gasolineKmPerLiter: gasolineConsumption,
-      ethanolKmPerLiter: ethanolConsumption,
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            error ? Theme.of(context).colorScheme.error : null,
+      ),
     );
   }
 
-  static String? _errorMessage(FuelInputParseResult parseResult) {
-    return switch (parseResult) {
-      FuelInputParseFailure(userMessage: final String message) => message,
-      FuelInputParseSuccess() => null,
-    };
+  void _selectRule(Set<RuleMode> selection) {
+    ref.read(appPreferencesProvider.notifier).selectRule(selection.first);
   }
 
-  static Decimal? _successValue(FuelInputParseResult parseResult) {
-    return switch (parseResult) {
-      FuelInputParseSuccess(value: final Decimal? value) => value,
-      FuelInputParseFailure() => null,
-    };
+  void _submit() {
+    ref
+        .read(comparisonFormProvider.notifier)
+        .submit(
+          gasolinePriceText: CurrencyInputFormatter.toParserInput(
+            _gasolinePriceController.text,
+          ),
+          ethanolPriceText: CurrencyInputFormatter.toParserInput(
+            _ethanolPriceController.text,
+          ),
+          gasolineConsumptionText: _gasolineConsumptionController.text,
+          ethanolConsumptionText: _ethanolConsumptionController.text,
+        );
   }
 
   void _startNewCalculation() {
-    setState(() {
-      _gasolinePriceController.clear();
-      _ethanolPriceController.clear();
-      _gasolineConsumptionController.clear();
-      _ethanolConsumptionController.clear();
-      _rule = ComparisonRule.standard;
-      _gasolinePriceError = null;
-      _ethanolPriceError = null;
-      _gasolineConsumptionError = null;
-      _ethanolConsumptionError = null;
-      _result = null;
-    });
+    ref.read(comparisonFormProvider.notifier).reset();
+    _gasolinePriceController.clear();
+    _ethanolPriceController.clear();
+    _gasolineConsumptionController.clear();
+    _ethanolConsumptionController.clear();
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(ComparisonFormState form, RuleMode ruleMode) {
     return SingleChildScrollView(
       child: SafeArea(
         child: Padding(
@@ -271,7 +202,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               FuelInputField(
                 label: 'Preço da gasolina',
                 controller: _gasolinePriceController,
-                errorText: _gasolinePriceError,
+                errorText: form.gasolinePriceError,
                 prefixText: 'R\$ ',
                 hintText: '6,29',
                 useCurrencyMask: true,
@@ -279,7 +210,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               FuelInputField(
                 label: 'Preço do etanol',
                 controller: _ethanolPriceController,
-                errorText: _ethanolPriceError,
+                errorText: form.ethanolPriceError,
                 prefixText: 'R\$ ',
                 hintText: '4,59',
                 useCurrencyMask: true,
@@ -287,7 +218,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               FuelInputField(
                 label: 'Consumo de gasolina',
                 controller: _gasolineConsumptionController,
-                errorText: _gasolineConsumptionError,
+                errorText: form.gasolineConsumptionError,
                 suffixText: 'L',
                 hintText: 'Ex: 10',
                 helperText: 'Quantos km por litro na gasolina (opcional)',
@@ -295,7 +226,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               FuelInputField(
                 label: 'Consumo de etanol',
                 controller: _ethanolConsumptionController,
-                errorText: _ethanolConsumptionError,
+                errorText: form.ethanolConsumptionError,
                 suffixText: 'L',
                 hintText: 'Ex: 7',
                 helperText: 'Quantos km por litro no etanol (opcional)',
@@ -304,24 +235,24 @@ class _HomePageState extends ConsumerState<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 8,
                 children: <Widget>[
-                  SegmentedButton<ComparisonRule>(
-                    segments: const <ButtonSegment<ComparisonRule>>[
-                      ButtonSegment<ComparisonRule>(
-                        value: ComparisonRule.standard,
+                  SegmentedButton<RuleMode>(
+                    segments: const <ButtonSegment<RuleMode>>[
+                      ButtonSegment<RuleMode>(
+                        value: RuleMode.standard,
                         label: Text('Padrão (0,70)'),
                       ),
-                      ButtonSegment<ComparisonRule>(
-                        value: ComparisonRule.custom,
+                      ButtonSegment<RuleMode>(
+                        value: RuleMode.custom,
                         icon: Icon(Icons.directions_car),
                         label: Text('Personalizada'),
                       ),
                     ],
-                    selected: <ComparisonRule>{_rule},
+                    selected: <RuleMode>{ruleMode},
                     onSelectionChanged: _selectRule,
                   ),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
-                    child: _rule == ComparisonRule.custom
+                    child: ruleMode == RuleMode.custom
                         ? Text(
                             'O limiar será calculado pela divisão do consumo '
                             'do etanol pelo da gasolina informados acima.',
@@ -333,15 +264,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ],
               ),
               FilledButton.icon(
-                onPressed: _isSubmitting ? null : _submit,
-                icon: _isSubmitting
+                onPressed: form.isSubmitting ? null : _submit,
+                icon: form.isSubmitting
                     ? const SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.calculate),
-                label: Text(_isSubmitting ? 'Calculando...' : 'Calcular'),
+                label: Text(form.isSubmitting ? 'Calculando...' : 'Calcular'),
               ),
               Center(
                 child: Text(
@@ -359,8 +290,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildResult() {
-    final FuelCalculationResult result = _result!;
+  Widget _buildResult(FuelCalculationResult result) {
+    final HistorySaveStatus historySave =
+        ref.watch(comparisonFormProvider).historySave;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -374,6 +306,16 @@ class _HomePageState extends ConsumerState<HomePage> {
               icon: const Icon(Icons.refresh),
               label: const Text('Novo cálculo'),
             ),
+            const SizedBox(height: 4),
+            Text(
+              switch (historySave) {
+                HistorySaveSaving() => 'Salvando no histórico...',
+                HistorySaveSuccess() => 'Salvo no histórico.',
+                _ => '',
+              },
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ],
         ),
       ),
@@ -383,7 +325,30 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     _maybeShowWelcomeDialog();
-    final FuelCalculationResult? result = _result;
+    final ComparisonFormState form = ref.watch(comparisonFormProvider);
+    final RuleMode ruleMode =
+        ref.watch(appPreferencesProvider).value?.ruleMode ?? RuleMode.standard;
+
+    ref.listen<AsyncValue<VehicleProfile?>>(
+      vehicleProfileProvider,
+      (
+        AsyncValue<VehicleProfile?>? previous,
+        AsyncValue<VehicleProfile?> next,
+      ) {
+        final VehicleProfile? profile = next.value;
+        if (profile == null) {
+          return;
+        }
+        _prefillFromProfile(profile);
+      },
+    );
+
+    ref.listen<ComparisonFormState>(
+      comparisonFormProvider,
+      _onFormStateChanged,
+    );
+
+    final FuelCalculationResult? result = form.result;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -393,11 +358,35 @@ class _HomePageState extends ConsumerState<HomePage> {
               color: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(width: 8),
-            const Text('Fuelwise'),
+            const Flexible(
+              child: Text(
+                'Fuelwise',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.directions_car),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) => const ProfilePage(),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) => const HistoryPage(),
+              ),
+            ),
+          ),
+        ],
       ),
-      body: result == null ? _buildForm() : _buildResult(),
+      body: result == null ? _buildForm(form, ruleMode) : _buildResult(result),
     );
   }
 }
