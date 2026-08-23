@@ -8,10 +8,11 @@ Fuelwise is an offline-first Flutter Android application. No backend, no cloud, 
 |-----------|------|--------|
 | Flutter `3.47.1` (Android target) | Application framework | Pinned — see versions table in [`docs/planning/environment.md`](../docs/planning/environment.md) |
 | Dart `3.13.1` | Language (bundled with Flutter) | Bundled |
-| Riverpod `3.4.2` | State management (V1) | Implemented — preferences providers (V1 wave 1) |
-| Drift `2.34.3` + `drift_flutter 0.3.1` (+ `drift_dev` 2.34.5, `build_runner` 2.16.0) | Local persistence (V1) | Implemented — schema v1, profile persistence (V1 wave 2); history wiring pending (wave 3) |
-| shared_preferences `2.5.5` (`SharedPreferencesAsync`) | Lightweight preferences (V1) | Implemented — V1 wave 1 |
-| Docker + Docker Compose (`dev` service) | Reproducible dev environment | Implemented — image `fuelwise-dev`, smoke-tested |
+| Riverpod `3.4.2` | State management (V1) | Implemented — preferences, history, profile, comparison, export controllers |
+| Drift `2.34.3` + `drift_flutter 0.3.1` (+ `drift_dev` 2.34.5, `build_runner` 2.16.0) | Local persistence (V1) | Implemented — schema v1, profile persistence, history repository + monthly export source |
+| shared_preferences `2.5.5` (`SharedPreferencesAsync`) | Lightweight preferences (V1) | Implemented — welcome flag, rule mode, threshold, theme mode |
+| `share_plus 13.3.0` + `flutter_local_notifications 22.3.0` | History export delivery | Implemented — CSV via share sheet + completion notification |
+| Docker + Docker Compose (`dev` + `apk-server` services) | Reproducible dev environment + local APK server | Implemented — `fuelwise-dev` image; nginx `apk-server` on port 8080 |
 | Android SDK / Build Tools / NDK | APK builds inside container (API 36, minSdk 24) | Implemented; on-device install validated |
 
 Versions are pinned in the "Versions and prerequisites" section of `docs/planning/environment.md` (recorded by ENV-001). Do not assume a version that is not documented there.
@@ -37,7 +38,7 @@ Versions are pinned in the "Versions and prerequisites" section of `docs/plannin
 
 No host-side Flutter installation is required once the ENV image exists; before that, any temporary host-side Flutter must match the versions recorded by ENV-001.
 
-## Canonical commands (defined by ENV phase)
+## Canonical commands
 
 ```bash
 docker compose build dev
@@ -45,10 +46,6 @@ docker compose run --rm dev flutter pub get
 docker compose run --rm dev flutter analyze
 docker compose run --rm dev flutter test
 docker compose run --rm dev flutter build apk --debug
-```
-
-These commands do not exist yet until ENV-003/ENV-004 are implemented. If `docker-compose.yml` is absent, record:
-
-```
-NOT FOUND
+docker compose up -d apk-server        # local APK server (port 8080)
+docker compose down                    # stop all services
 ```
