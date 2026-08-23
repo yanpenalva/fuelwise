@@ -134,7 +134,7 @@ void main() {
         find.widgetWithText(FuelInputField, 'Consumo de etanol'),
       );
 
-      expect(gasolineField.controller.text, '10.5');
+      expect(gasolineField.controller.text, '10,5');
       expect(ethanolField.controller.text, '7');
 
       await _calculate(tester, gasolinePrice: '6,00', ethanolPrice: '4,19');

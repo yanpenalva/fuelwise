@@ -111,12 +111,12 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (_gasolineConsumptionController.text.isEmpty &&
         profile.gasolineKmPerLiter != null) {
       _gasolineConsumptionController.text =
-          profile.gasolineKmPerLiter!.toString();
+          profile.gasolineKmPerLiter!.toString().replaceAll('.', ',');
     }
     if (_ethanolConsumptionController.text.isEmpty &&
         profile.ethanolKmPerLiter != null) {
       _ethanolConsumptionController.text =
-          profile.ethanolKmPerLiter!.toString();
+          profile.ethanolKmPerLiter!.toString().replaceAll('.', ',');
     }
   }
 
@@ -318,9 +318,10 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 4),
             Text(
               switch (historySave) {
+                HistorySaveIdle() => '',
                 HistorySaveSaving() => 'Salvando no histórico...',
                 HistorySaveSuccess() => 'Salvo no histórico.',
-                _ => '',
+                HistorySaveFailure() => '',
               },
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
