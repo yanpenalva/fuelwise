@@ -26,7 +26,23 @@ Start the server:
 docker compose up -d apk-server
 ```
 
-What runs: an `nginx:1.27-alpine` service on port `8080` (published), serving `docker/nginx/index.html` at `/` and the APK directory at `/apk/` (read-only mount of `build/app/outputs/flutter-apk`). No application data is exposed; only the APK and static page.
+What runs: an `nginx:1.27-alpine` service serving `docker/nginx/index.html` at `/` and the APK directory at `/apk/` (read-only mount of `build/app/outputs/flutter-apk`). No application data is exposed; only the APK and static page.
+
+HTTP (`:8080`) redirects to HTTPS (`:8443`): modern Chrome refuses APK downloads over plain HTTP, so the download page and the APK are served with a self-signed certificate.
+
+One-time certificate generation (host, requires `openssl`; certs are git-ignored — never commit the key):
+
+```bash
+mkdir -p docker/nginx/certs
+openssl req -x509 -newkey rsa:2048 \
+  -keyout docker/nginx/certs/server.key \
+  -out docker/nginx/certs/server.crt \
+  -days 3650 -nodes -subj "/CN=HOST_IP" \
+  -addext "subjectAltName=IP:HOST_IP,IP:127.0.0.1,DNS:localhost"
+docker compose up -d apk-server
+```
+
+The phone will show a self-signed warning once — tap **Advanced → Proceed**; it is then remembered for this server.
 
 Find the host IP (Linux):
 
@@ -45,7 +61,7 @@ curl -sI http://127.0.0.1:8080/apk/app-debug.apk | head -1   # expect 200
 ## HOST-003 — Install/update from the phone browser
 
 1. Put the phone on the same Wi-Fi as the host.
-2. Open `http://HOST_IP:8080` in the phone browser.
+2. Open `https://HOST_IP:8443` in the phone browser (accept the self-signed warning once).
 3. Tap **Baixar APK (app-debug.apk)**.
 4. When prompted, allow installing from this source ("unknown sources").
 5. Open the downloaded file and install. For an update, repeat — `install -r` semantics keep app data.
