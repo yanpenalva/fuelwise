@@ -81,7 +81,7 @@ void main() {
     expect(repository.saveCount, 0);
   });
 
-  testWidgets('negative consumption shows inline error and does not save',
+  testWidgets('strips invalid characters from consumption while typing',
       (tester) async {
     final _FakeVehicleProfileRepository repository =
         _FakeVehicleProfileRepository();
@@ -90,13 +90,13 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextFormField).at(0), 'Meu carro');
-    await tester.enterText(find.byType(TextFormField).at(1), '-1');
+    await tester.enterText(find.byType(TextFormField).at(1), '-1a.5');
 
     await tester.tap(find.text('Salvar'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Informe um valor maior que zero.'), findsOneWidget);
-    expect(repository.saveCount, 0);
+    expect(repository.saveCount, 1);
+    expect(repository.saved?.gasolineKmPerLiter, Decimal.parse('1.5'));
   });
 
   testWidgets('prefills fields from loaded profile', (tester) async {

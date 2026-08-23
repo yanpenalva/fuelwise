@@ -1,9 +1,11 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../application/profile/vehicle_profile_controller.dart';
 import '../../domain/vehicle_profile.dart';
+import '../widgets/fuel_input_field.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -163,6 +165,7 @@ class _ProfileFormState extends ConsumerState<_ProfileForm> {
     return TextFormField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: <TextInputFormatter>[DecimalInputFormatter()],
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,

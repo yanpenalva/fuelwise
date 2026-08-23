@@ -1,6 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+class DecimalInputFormatter extends TextInputFormatter {
+  static final RegExp _digit = RegExp(r'[0-9]');
+  static const String _normalizedSeparator = ',';
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final StringBuffer formatted = StringBuffer();
+    var separatorSeen = false;
+
+    for (final String char in newValue.text.split('')) {
+      if (_digit.hasMatch(char)) {
+        formatted.write(char);
+        continue;
+      }
+      if (_isSeparator(char)) {
+        if (separatorSeen) {
+          continue;
+        }
+        separatorSeen = true;
+        if (formatted.isEmpty) {
+          formatted.write('0');
+        }
+        formatted.write(_normalizedSeparator);
+      }
+    }
+
+    final String text = formatted.toString();
+
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+
+  static bool _isSeparator(String char) {
+    return char == ',' || char == '.';
+  }
+}
+
 class CurrencyInputFormatter extends TextInputFormatter {
   static final RegExp _digitsOnly = RegExp(r'[0-9]');
   static const int _maxDigits = 9;
@@ -93,7 +135,7 @@ class FuelInputField extends StatelessWidget {
         if (useCurrencyMask)
           CurrencyInputFormatter()
         else
-          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+          DecimalInputFormatter(),
       ],
       decoration: InputDecoration(
         labelText: label,
