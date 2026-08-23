@@ -203,4 +203,41 @@ void main() {
     expect(state.hasError, isTrue);
     expect(state.error, isException);
   });
+
+  test('keeps entries within the cap and evicts the oldest on record',
+      () async {
+    final _InMemoryCalculationHistory repository =
+        _InMemoryCalculationHistory(<CalculationHistoryEntry>[
+      for (var id = 1; id <= HistoryController.maxHistoryEntries; id++)
+        _entry(
+          id,
+          DateTime.fromMillisecondsSinceEpoch(1000 * id, isUtc: true),
+        ),
+    ]);
+    final ProviderContainer container = ProviderContainer(
+      overrides: [
+        calculationHistoryRepositoryProvider.overrideWithValue(repository),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(historyProvider.future);
+    final HistoryController controller =
+        container.read(historyProvider.notifier);
+
+    await controller.record(input: _input(), result: _result());
+
+    final List<CalculationHistoryEntry> state =
+        container.read(historyProvider).requireValue;
+    expect(state.length, HistoryController.maxHistoryEntries);
+    expect(
+      state.first.id,
+      HistoryController.maxHistoryEntries + 1,
+    );
+    expect(
+      repository.stored.any(
+        (CalculationHistoryEntry entry) => entry.id == 1,
+      ),
+      isFalse,
+    );
+  });
 }

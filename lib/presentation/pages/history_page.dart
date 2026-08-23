@@ -100,46 +100,49 @@ class HistoryPage extends ConsumerWidget {
     WidgetRef ref,
     List<CalculationHistoryEntry> entries,
   ) {
-    return ListView.separated(
+    final List<(String, List<CalculationHistoryEntry>)> months =
+        _groupByMonth(entries);
+
+    return ListView(
       padding: const EdgeInsets.all(16),
-      itemCount: entries.length,
-      separatorBuilder: (BuildContext context, int index) =>
-          const SizedBox(height: 8),
-      itemBuilder: (BuildContext context, int index) {
-        final CalculationHistoryEntry entry = entries[index];
-        return Card(
-          elevation: 0,
-          margin: EdgeInsets.zero,
-          child: ListTile(
-            title: Text(_dateFormat.format(entry.createdAt.toLocal())),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 4,
-              children: <Widget>[
-                Text(
-                  _recommendationLabel(entry.recommendedFuel),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-                Text('Gasolina: ${_formatMoney(entry.gasolinePrice)}'),
-                Text('Etanol: ${_formatMoney(entry.ethanolPrice)}'),
-                Text(
-                  'Proporção: ${_formatRatio(entry.ratio)}'
-                  ' · ${_thresholdLabel(entry.thresholdSource)}',
-                ),
-              ],
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () => unawaited(_confirmDelete(context, ref, entry)),
-            ),
+      children: <Widget>[
+        for (final (String month, List<CalculationHistoryEntry> monthEntries)
+            in months)
+          _MonthSection(
+            month: month,
+            count: monthEntries.length,
+            entries: monthEntries,
+            onDelete: (CalculationHistoryEntry entry) =>
+                unawaited(_confirmDelete(context, ref, entry)),
           ),
-        );
-      },
+      ],
     );
   }
+
+  static List<(String, List<CalculationHistoryEntry>)> _groupByMonth(
+    List<CalculationHistoryEntry> entries,
+  ) {
+    final List<(String, List<CalculationHistoryEntry>)> months =
+        <(String, List<CalculationHistoryEntry>)>[];
+    String? currentMonth;
+
+    for (final CalculationHistoryEntry entry in entries) {
+      final DateTime local = entry.createdAt.toLocal();
+      final String month = '${_monthNames[local.month - 1]} de ${local.year}';
+      if (month != currentMonth) {
+        currentMonth = month;
+        months.add((month, <CalculationHistoryEntry>[]));
+      }
+      months.last.$2.add(entry);
+    }
+
+    return months;
+  }
+
+  static const List<String> _monthNames = <String>[
+    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+  ];
 
   static String _recommendationLabel(FuelType type) {
     return switch (type) {
@@ -196,5 +199,78 @@ class HistoryPage extends ConsumerWidget {
         ),
       );
     }
+  }
+}
+
+final class _MonthSection extends StatelessWidget {
+  const _MonthSection({
+    required this.month,
+    required this.count,
+    required this.entries,
+    required this.onDelete,
+  });
+
+  final String month;
+  final int count;
+  final List<CalculationHistoryEntry> entries;
+  final void Function(CalculationHistoryEntry entry) onDelete;
+
+  static String _capitalize(String value) {
+    if (value.isEmpty) {
+      return value;
+    }
+    return value[0].toUpperCase() + value.substring(1);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpansionTile(
+      initiallyExpanded: true,
+      tilePadding: EdgeInsets.zero,
+      shape: const Border(),
+      collapsedShape: const Border(),
+      title: Text(_capitalize(month)),
+      subtitle: Text(count == 1 ? '1 registro' : '$count registros'),
+      children: <Widget>[
+        for (final CalculationHistoryEntry entry in entries)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Card(
+              elevation: 0,
+              margin: EdgeInsets.zero,
+              child: ListTile(
+                title: Text(HistoryPage._dateFormat.format(entry.createdAt.toLocal())),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 4,
+                  children: <Widget>[
+                    Text(
+                      HistoryPage._recommendationLabel(entry.recommendedFuel),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    Text(
+                      'Gasolina: ${HistoryPage._formatMoney(entry.gasolinePrice)}',
+                    ),
+                    Text(
+                      'Etanol: ${HistoryPage._formatMoney(entry.ethanolPrice)}',
+                    ),
+                    Text(
+                      'Proporção: ${HistoryPage._formatRatio(entry.ratio)}'
+                      ' · ${HistoryPage._thresholdLabel(entry.thresholdSource)}',
+                    ),
+                  ],
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => onDelete(entry),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }

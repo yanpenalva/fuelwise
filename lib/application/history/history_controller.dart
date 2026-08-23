@@ -17,6 +17,8 @@ final AsyncNotifierProvider<HistoryController, List<CalculationHistoryEntry>>
 );
 
 class HistoryController extends AsyncNotifier<List<CalculationHistoryEntry>> {
+  static const int maxHistoryEntries = 500;
+
   @override
   Future<List<CalculationHistoryEntry>> build() async {
     return ref.read(calculationHistoryRepositoryProvider).loadAll();
@@ -37,7 +39,18 @@ class HistoryController extends AsyncNotifier<List<CalculationHistoryEntry>> {
       return;
     }
 
-    state = AsyncData([entry, ...current]);
+    final List<CalculationHistoryEntry> updated = [entry, ...current];
+
+    if (updated.length > maxHistoryEntries) {
+      final List<CalculationHistoryEntry> evicted =
+          updated.sublist(maxHistoryEntries);
+      for (final CalculationHistoryEntry old in evicted) {
+        await repository.deleteById(old.id);
+      }
+      updated.removeRange(maxHistoryEntries, updated.length);
+    }
+
+    state = AsyncData(updated);
   }
 
   Future<void> deleteById(int id) async {

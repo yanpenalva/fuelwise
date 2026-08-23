@@ -130,6 +130,43 @@ void main() {
     expect(newerDy, lessThan(olderDy));
   });
 
+  testWidgets('groups entries by month with expandable headers',
+      (tester) async {
+    final _FakeCalculationHistoryRepository repository =
+        _FakeCalculationHistoryRepository()
+          ..entries = <CalculationHistoryEntry>[
+            _buildEntry(
+              id: 3,
+              createdAt: DateTime(2026, 8, 21, 9, 15),
+            ),
+            _buildEntry(
+              id: 2,
+              createdAt: DateTime(2026, 8, 20, 14, 30),
+            ),
+            _buildEntry(
+              id: 1,
+              createdAt: DateTime(2026, 7, 5, 10, 0),
+            ),
+          ];
+
+    await _pumpHistoryPage(tester, repository);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Agosto de 2026'), findsOneWidget);
+    expect(find.text('2 registros'), findsOneWidget);
+    expect(find.text('Julho de 2026'), findsOneWidget);
+    expect(find.text('1 registro'), findsOneWidget);
+    expect(find.text('21/08/2026 09:15'), findsOneWidget);
+    expect(find.text('05/07/2026 10:00'), findsOneWidget);
+
+    await tester.tap(find.text('Agosto de 2026'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('21/08/2026 09:15'), findsNothing);
+    expect(find.text('20/08/2026 14:30'), findsNothing);
+    expect(find.text('05/07/2026 10:00'), findsOneWidget);
+  });
+
   testWidgets('deletes entry after confirmation', (tester) async {
     final _FakeCalculationHistoryRepository repository =
         _FakeCalculationHistoryRepository()
