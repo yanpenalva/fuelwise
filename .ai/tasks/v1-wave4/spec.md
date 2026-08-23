@@ -74,9 +74,13 @@ Per step: affected tests, then gate `docker compose run --rm dev flutter analyze
 
 ## Versioned Handoff
 
-Wave 4 opened 2026-08-22 immediately after retroactive cross-review of waves 1–3 (done this session via explore-subagent fallback; cavecrew reviewer/investigator still broken until opencode server restart — frontmatter fix applied but server caches old agent model). Four MAJOR findings fixed and pushed (commits e025370, b118a61, 7f2739c; suite 143→146). MINOR findings either folded into this wave's scope (prefill format, sealed-switch wildcard) or listed below as open user tasks:
+Wave 4 opened 2026-08-22 immediately after retroactive cross-review of waves 1–3 (done this session via explore-subagent fallback; cavecrew reviewer/investigator still broken until opencode server restart — frontmatter fix applied but server caches old agent model). Four MAJOR findings fixed and pushed (commits e025370, b118a61, 7f2739c; suite 143→146). MINOR findings either folded into this wave's scope (prefill format, sealed-switch wildcard) or listed below as open MINOR decisions (user decides):
 
-- Open MINOR backlog (user decides): drift `dateTime` epoch-seconds representation (reads back local-time DateTime; consider `store_date_time_values_as_text` before schema v2), sqlcipher EOL transitive dep audit, `requireValue` race guards in preferences controller, side-effect-in-build welcome dialog trigger, `rule_mode.dart` placement vs infrastructure mapping rule, profile load-error silent blank form, history controller read-modify-write state races, duplicate car icon semantics, unused-import lint verification.
+- Open MINOR decisions: drift `dateTime` epoch-seconds representation (reads back local-time DateTime; consider `store_date_time_values_as_text` before schema v2), sqlcipher EOL transitive dep audit, `requireValue` race guards in preferences controller, side-effect-in-build welcome dialog trigger, `rule_mode.dart` placement vs infrastructure mapping rule, profile load-error silent blank form, history controller read-modify-write state races, duplicate car icon semantics, unused-import lint verification.
+
+Backlog (product): **manual dark-mode toggle persisted via preferences** (own wave, user decision 2026-08-22) — single backlog item.
+
+Operational note (not backlog): the opencode server must be restarted once so cavecrew reviewer/investigator agents pick up `opencode/big-pickle` from frontmatter (files fixed since wave 2; in-memory server cache still resolves the old `haiku` model — verified failing again on 2026-08-23; file touch does not reload).
 
 Next concrete actions: implement V1-012 → V1-013 → V1-014 code steps, then APK build + device smoke, then wrap up.
 
@@ -84,9 +88,10 @@ Next concrete actions: implement V1-012 → V1-013 → V1-014 code steps, then A
 
 ## Execution record
 
-### V1-012 — UX (commit 6de6bff)
+### V1-012 — UX (commits 6de6bff, 92413a4)
 
 - `home_page.dart`: profile prefill now writes pt-BR comma decimals; `HistorySaveStatus` switch made exhaustive (no wildcard).
+- `home_page.dart` (commit 92413a4): cold start shows a branded loading state — app icon, name, motto "Combustível certo, custo consciente." and spinner — while initial preferences load (`appPreferencesProvider.isLoading`), instead of flashing the form with defaults. Widget test `test/presentation/launch_loading_test.dart` pins loading → form transition.
 - New user requirement, committed bf57793: consumption fields accept **dot or comma** as decimal separator with on-the-fly formatting via new `DecimalInputFormatter` (`lib/presentation/widgets/fuel_input_field.dart`). Normalizes `.` → `,`, keeps a single separator, prefixes `0` for leading separators, strips invalid chars. Applied to home consumption fields and profile form (profile page previously had no formatter). Unit tests in `test/presentation/decimal_input_formatter_test.dart`. Regression: replaced obsolete "negative consumption" widget test (minus now untypeable) with stripping test.
 
 ### V1-013 — persistence hardening (commit 8f7c139)

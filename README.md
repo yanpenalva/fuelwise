@@ -6,7 +6,7 @@ The product is intentionally local: after installation, calculations, vehicle pr
 
 ## Current status
 
-The ENV phase is implemented: the development Docker image and Compose setup are in place, and the toolchain inside the container is smoke-tested (`flutter analyze`, `flutter test`, and `flutter build apk` run in the container). Product code starts with V0, following [`docs/planning/execution-order.md`](docs/planning/execution-order.md).
+ENV and V0 are complete. V1 is implemented and pushed on `main`: Riverpod state composition, Drift local persistence (schema v1, profile + history), persisted preferences, first-run welcome dialog, branded launch loading with the app motto, history screen with confirmed deletion, vehicle profile screen, and full offline device validation on a Moto G35 5G (airplane mode, dark mode, rotation). Product code follows [`docs/planning/execution-order.md`](docs/planning/execution-order.md).
 
 ## Product scope
 
@@ -15,6 +15,8 @@ The ENV phase is implemented: the development Docker image and Compose setup are
 - Explain the rule used by the recommendation.
 - Show cost per kilometer, maximum recommended ethanol price, and threshold difference.
 - Store one vehicle profile and calculation history locally in V1.
+- Show a branded loading state with the app motto on launch.
+- Accept dot or comma as decimal separator in consumption fields, formatted to pt-BR comma as the user types.
 - Generate and distribute a test APK locally over Wi-Fi after V1.
 
 The following are out of scope: backend services, cloud synchronization, multiple vehicles, real refueling records, exports, maps, geolocation, Flutter Web, public hosting, app-store publishing, and remote CI/CD.
