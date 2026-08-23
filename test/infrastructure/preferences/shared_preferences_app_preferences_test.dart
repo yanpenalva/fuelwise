@@ -18,7 +18,8 @@ final class _InMemorySharedPreferencesAsync implements SharedPreferencesAsync {
   Future<bool> containsKey(String key) async => values.containsKey(key);
 
   @override
-  Future<bool?> getBool(String key) async => values[key] as bool?;
+  Future<bool?> getBool(String key) async =>
+      values[key] is bool ? values[key] as bool : null;
 
   @override
   Future<double?> getDouble(String key) async => values[key] as double?;
@@ -152,6 +153,37 @@ void main() {
     final AppPreferencesData loaded = await repository.load();
 
     expect(loaded.customThreshold, isNull);
+  });
+
+  test('yields null custom threshold when stored negative', () async {
+    store.values[PreferenceKeys.customThreshold] = '-1';
+    final SharedPreferencesAppPreferences repository =
+        SharedPreferencesAppPreferences(store);
+
+    final AppPreferencesData loaded = await repository.load();
+
+    expect(loaded.customThreshold, isNull);
+  });
+
+  test('yields null custom threshold when stored zero', () async {
+    store.values[PreferenceKeys.customThreshold] = '0';
+    final SharedPreferencesAppPreferences repository =
+        SharedPreferencesAppPreferences(store);
+
+    final AppPreferencesData loaded = await repository.load();
+
+    expect(loaded.customThreshold, isNull);
+  });
+
+  test('falls back to unseen welcome flag when stored value has wrong type',
+      () async {
+    store.values[PreferenceKeys.welcomeSeen] = 'yes';
+    final SharedPreferencesAppPreferences repository =
+        SharedPreferencesAppPreferences(store);
+
+    final AppPreferencesData loaded = await repository.load();
+
+    expect(loaded.hasSeenWelcome, isFalse);
   });
 
   test('removes stored key when saving null custom threshold', () async {

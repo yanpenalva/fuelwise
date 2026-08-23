@@ -14,6 +14,10 @@ void main() {
     await database.close();
   });
 
+  test('pins schema version to 1', () {
+    expect(database.schemaVersion, 1);
+  });
+
   test('creates both tables on open', () async {
     final vehicles = await database
         .customSelect('SELECT name FROM sqlite_master WHERE type = ?',

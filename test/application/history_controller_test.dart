@@ -36,7 +36,10 @@ final class _InMemoryCalculationHistory implements CalculationHistoryRepository 
   }) async {
     final CalculationHistoryEntry entry = CalculationHistoryEntry(
       id: _nextId++,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(1000 * _nextId),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        1000 * _nextId,
+        isUtc: true,
+      ),
       gasolinePrice: input.gasolinePrice.value,
       ethanolPrice: input.ethanolPrice.value,
       gasolineConsumption: input.efficiency?.gasolineKmPerLiter,
@@ -114,8 +117,8 @@ void main() {
   test('initial build loads entries newest first', () async {
     final _InMemoryCalculationHistory repository =
         _InMemoryCalculationHistory(<CalculationHistoryEntry>[
-      _entry(1, DateTime.fromMillisecondsSinceEpoch(1000)),
-      _entry(2, DateTime.fromMillisecondsSinceEpoch(2000)),
+      _entry(1, DateTime.fromMillisecondsSinceEpoch(1000, isUtc: true)),
+      _entry(2, DateTime.fromMillisecondsSinceEpoch(2000, isUtc: true)),
     ]);
     final ProviderContainer container = ProviderContainer(
       overrides: [
@@ -160,9 +163,9 @@ void main() {
   test('deleteById removes only that entry from state', () async {
     final _InMemoryCalculationHistory repository =
         _InMemoryCalculationHistory(<CalculationHistoryEntry>[
-      _entry(1, DateTime.fromMillisecondsSinceEpoch(1000)),
-      _entry(2, DateTime.fromMillisecondsSinceEpoch(2000)),
-      _entry(3, DateTime.fromMillisecondsSinceEpoch(3000)),
+      _entry(1, DateTime.fromMillisecondsSinceEpoch(1000, isUtc: true)),
+      _entry(2, DateTime.fromMillisecondsSinceEpoch(2000, isUtc: true)),
+      _entry(3, DateTime.fromMillisecondsSinceEpoch(3000, isUtc: true)),
     ]);
     final ProviderContainer container = ProviderContainer(
       overrides: [
