@@ -25,6 +25,8 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  static const String _slogan = 'Combustível certo, custo consciente.';
+
   final TextEditingController _gasolinePriceController =
       TextEditingController();
   final TextEditingController _ethanolPriceController =
@@ -332,9 +334,54 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
+  Widget _buildLaunchLoading() {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.local_gas_station,
+                size: 48,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Fuelwise',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _slogan,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: 24),
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _maybeShowWelcomeDialog();
+    final AsyncValue<AppPreferencesData> preferences =
+        ref.watch(appPreferencesProvider);
+
+    if (preferences.isLoading) {
+      return _buildLaunchLoading();
+    }
+
     final ComparisonFormState form = ref.watch(comparisonFormProvider);
     final RuleMode ruleMode =
         ref.watch(appPreferencesProvider).value?.ruleMode ?? RuleMode.standard;
