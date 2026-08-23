@@ -6,6 +6,7 @@ import 'package:fuelwise/application/preferences/app_preferences.dart';
 import 'package:fuelwise/application/preferences/app_preferences_controller.dart';
 import 'package:fuelwise/application/preferences/app_preferences_data.dart';
 import 'package:fuelwise/application/preferences/rule_mode.dart';
+import 'package:fuelwise/application/preferences/theme_mode_preference.dart';
 import 'package:fuelwise/presentation/pages/home_page.dart';
 
 final class _InMemoryAppPreferences implements AppPreferences {
@@ -28,6 +29,9 @@ final class _InMemoryAppPreferences implements AppPreferences {
 
   @override
   Future<void> saveRuleMode({required RuleMode mode}) async {}
+
+  @override
+  Future<void> saveThemeMode({required ThemeModePreference mode}) async {}
 }
 
 Future<void> _pumpHome(WidgetTester tester, AppPreferences repository) {
@@ -71,7 +75,7 @@ void main() {
     expect(find.text('Bem-vindo ao Fuelwise'), findsNothing);
   });
 
-  testWidgets('shows form without dialog while preferences loading',
+  testWidgets('shows branded loading instead of form while preferences loading',
       (tester) async {
     await _pumpHome(
       tester,
@@ -79,9 +83,10 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Calcular'), findsOneWidget);
+    expect(find.text('Combustível certo, custo consciente.'), findsOneWidget);
     expect(find.text('Bem-vindo ao Fuelwise'), findsNothing);
 
     await tester.pumpAndSettle();
+    expect(find.text('Bem-vindo ao Fuelwise'), findsOneWidget);
   });
 }

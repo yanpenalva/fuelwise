@@ -5,6 +5,7 @@ import 'package:fuelwise/application/preferences/app_preferences.dart';
 import 'package:fuelwise/application/preferences/app_preferences_controller.dart';
 import 'package:fuelwise/application/preferences/app_preferences_data.dart';
 import 'package:fuelwise/application/preferences/rule_mode.dart';
+import 'package:fuelwise/application/preferences/theme_mode_preference.dart';
 
 final class _InMemoryAppPreferences implements AppPreferences {
   _InMemoryAppPreferences(this._data);
@@ -13,6 +14,7 @@ final class _InMemoryAppPreferences implements AppPreferences {
   bool? savedWelcomeSeen;
   RuleMode? savedRuleMode;
   Decimal? savedCustomThreshold;
+  ThemeModePreference? savedThemeMode;
 
   @override
   Future<AppPreferencesData> load() async => _data;
@@ -38,6 +40,12 @@ final class _InMemoryAppPreferences implements AppPreferences {
     savedRuleMode = mode;
     _data = _data.copyWith(ruleMode: mode);
   }
+
+  @override
+  Future<void> saveThemeMode({required ThemeModePreference mode}) async {
+    savedThemeMode = mode;
+    _data = _data.copyWith(themeMode: mode);
+  }
 }
 
 final class _ThrowingAppPreferences implements AppPreferences {
@@ -52,6 +60,9 @@ final class _ThrowingAppPreferences implements AppPreferences {
 
   @override
   Future<void> saveRuleMode({required RuleMode mode}) async {}
+
+  @override
+  Future<void> saveThemeMode({required ThemeModePreference mode}) async {}
 }
 
 void main() {
@@ -147,6 +158,25 @@ void main() {
       container.read(appPreferencesProvider).requireValue.customThreshold,
       isNull,
     );
+  });
+
+  test('selectThemeMode persists and updates state', () async {
+    final _InMemoryAppPreferences repository =
+        _InMemoryAppPreferences(const AppPreferencesData.defaults());
+    final ProviderContainer container = ProviderContainer(
+      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+    );
+    addTearDown(container.dispose);
+    await container.read(appPreferencesProvider.future);
+
+    await container
+        .read(appPreferencesProvider.notifier)
+        .selectThemeMode(ThemeModePreference.dark);
+
+    expect(repository.savedThemeMode, ThemeModePreference.dark);
+    final AppPreferencesData state =
+        container.read(appPreferencesProvider).requireValue;
+    expect(state.themeMode, ThemeModePreference.dark);
   });
 
   test('exposes error state when repository load throws', () async {

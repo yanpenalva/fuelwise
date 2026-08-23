@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'application/history/history_controller.dart';
 import 'application/preferences/app_preferences_controller.dart';
+import 'application/preferences/theme_mode_preference.dart';
 import 'application/profile/vehicle_profile_controller.dart';
 import 'infrastructure/database/app_database.dart';
 import 'infrastructure/database/drift_calculation_history_repository.dart';
@@ -33,16 +34,28 @@ void main() {
   );
 }
 
-class FuelwiseApp extends StatelessWidget {
+class FuelwiseApp extends ConsumerWidget {
   const FuelwiseApp({super.key});
 
+  static ThemeMode _toThemeMode(ThemeModePreference preference) {
+    return switch (preference) {
+      ThemeModePreference.system => ThemeMode.system,
+      ThemeModePreference.light => ThemeMode.light,
+      ThemeModePreference.dark => ThemeMode.dark,
+    };
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeModePreference preference =
+        ref.watch(appPreferencesProvider).value?.themeMode ??
+            ThemeModePreference.system;
+
     return MaterialApp(
       title: 'Fuelwise',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: _toThemeMode(preference),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

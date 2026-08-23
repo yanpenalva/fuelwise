@@ -8,6 +8,7 @@ import '../../application/comparison/comparison_form_state.dart';
 import '../../application/preferences/app_preferences_controller.dart';
 import '../../application/preferences/app_preferences_data.dart';
 import '../../application/preferences/rule_mode.dart';
+import '../../application/preferences/theme_mode_preference.dart';
 import '../../application/profile/vehicle_profile_controller.dart';
 import '../../domain/fuel_calculation_result.dart';
 import '../../domain/vehicle_profile.dart';
@@ -26,6 +27,9 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   static const String _slogan = 'Combustível certo, custo consciente.';
+  static const Duration _minimumSplashDuration = Duration(seconds: 1);
+
+  Timer? _splashTimer;
 
   final TextEditingController _gasolinePriceController =
       TextEditingController();
@@ -39,7 +43,18 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool _welcomeDialogShown = false;
 
   @override
+  void initState() {
+    super.initState();
+    _splashTimer = Timer(_minimumSplashDuration, () {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _splashTimer?.cancel();
     _gasolinePriceController.dispose();
     _ethanolPriceController.dispose();
     _gasolineConsumptionController.dispose();
@@ -150,6 +165,27 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _selectRule(Set<RuleMode> selection) {
     ref.read(appPreferencesProvider.notifier).selectRule(selection.first);
+  }
+
+  void _cycleThemeMode(ThemeModePreference current) {
+    final ThemeModePreference next = _nextThemeMode(current);
+    ref.read(appPreferencesProvider.notifier).selectThemeMode(next);
+  }
+
+  static ThemeModePreference _nextThemeMode(ThemeModePreference current) {
+    return switch (current) {
+      ThemeModePreference.system => ThemeModePreference.light,
+      ThemeModePreference.light => ThemeModePreference.dark,
+      ThemeModePreference.dark => ThemeModePreference.system,
+    };
+  }
+
+  static IconData _themeModeIcon(ThemeModePreference mode) {
+    return switch (mode) {
+      ThemeModePreference.system => Icons.brightness_auto,
+      ThemeModePreference.light => Icons.light_mode,
+      ThemeModePreference.dark => Icons.dark_mode,
+    };
   }
 
   void _submit() {
@@ -378,7 +414,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final AsyncValue<AppPreferencesData> preferences =
         ref.watch(appPreferencesProvider);
 
-    if (preferences.isLoading) {
+    if (preferences.isLoading || _splashTimer?.isActive == true) {
       return _buildLaunchLoading();
     }
 
@@ -406,6 +442,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
 
     final FuelCalculationResult? result = form.result;
+    final ThemeModePreference themeMode =
+        preferences.value?.themeMode ?? ThemeModePreference.system;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -425,6 +463,11 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(_themeModeIcon(themeMode)),
+            tooltip: 'Alternar tema',
+            onPressed: () => _cycleThemeMode(themeMode),
+          ),
           IconButton(
             icon: const Icon(Icons.directions_car),
             onPressed: () => Navigator.of(context).push(

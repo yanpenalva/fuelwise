@@ -2,6 +2,7 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fuelwise/application/preferences/app_preferences_data.dart';
 import 'package:fuelwise/application/preferences/rule_mode.dart';
+import 'package:fuelwise/application/preferences/theme_mode_preference.dart';
 import 'package:fuelwise/infrastructure/preferences/preference_keys.dart';
 import 'package:fuelwise/infrastructure/preferences/shared_preferences_app_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -184,6 +185,36 @@ void main() {
     final AppPreferencesData loaded = await repository.load();
 
     expect(loaded.hasSeenWelcome, isFalse);
+  });
+
+  test('round-trips theme mode write and read', () async {
+    final SharedPreferencesAppPreferences repository =
+        SharedPreferencesAppPreferences(store);
+
+    await repository.saveThemeMode(mode: ThemeModePreference.dark);
+
+    final AppPreferencesData loaded = await repository.load();
+
+    expect(loaded.themeMode, ThemeModePreference.dark);
+  });
+
+  test('falls back to system theme mode when stored string unknown', () async {
+    store.values[PreferenceKeys.themeMode] = 'nonsense';
+    final SharedPreferencesAppPreferences repository =
+        SharedPreferencesAppPreferences(store);
+
+    final AppPreferencesData loaded = await repository.load();
+
+    expect(loaded.themeMode, ThemeModePreference.system);
+  });
+
+  test('falls back to system theme mode when key absent', () async {
+    final SharedPreferencesAppPreferences repository =
+        SharedPreferencesAppPreferences(store);
+
+    final AppPreferencesData loaded = await repository.load();
+
+    expect(loaded.themeMode, ThemeModePreference.system);
   });
 
   test('removes stored key when saving null custom threshold', () async {

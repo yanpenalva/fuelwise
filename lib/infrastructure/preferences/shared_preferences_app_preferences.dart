@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../application/preferences/app_preferences.dart';
 import '../../application/preferences/app_preferences_data.dart';
 import '../../application/preferences/rule_mode.dart';
+import '../../application/preferences/theme_mode_preference.dart';
 import 'preference_keys.dart';
 
 class SharedPreferencesAppPreferences implements AppPreferences {
@@ -18,10 +19,13 @@ class SharedPreferencesAppPreferences implements AppPreferences {
         await preferences.getBool(PreferenceKeys.welcomeSeen) ?? false;
     final String? modeName =
         await preferences.getString(PreferenceKeys.ruleMode);
+    final String? themeModeName =
+        await preferences.getString(PreferenceKeys.themeMode);
     return AppPreferencesData(
       hasSeenWelcome: welcomeSeen,
       ruleMode: ruleModeFromName(modeName),
       customThreshold: await _readCustomThreshold(),
+      themeMode: themeModePreferenceFromName(themeModeName),
     );
   }
 
@@ -44,6 +48,11 @@ class SharedPreferencesAppPreferences implements AppPreferences {
       PreferenceKeys.customThreshold,
       value.toString(),
     );
+  }
+
+  @override
+  Future<void> saveThemeMode({required ThemeModePreference mode}) {
+    return preferences.setString(PreferenceKeys.themeMode, mode.name);
   }
 
   Future<Decimal?> _readCustomThreshold() async {

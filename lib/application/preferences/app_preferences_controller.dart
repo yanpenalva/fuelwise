@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app_preferences.dart';
 import 'app_preferences_data.dart';
 import 'rule_mode.dart';
+import 'theme_mode_preference.dart';
 
 final Provider<AppPreferences> appPreferencesRepositoryProvider =
     Provider<AppPreferences>(
@@ -49,6 +50,15 @@ class AppPreferencesController extends AsyncNotifier<AppPreferencesData> {
         customThreshold: value,
         setCustomThreshold: true,
       ),
+    );
+  }
+
+  Future<void> selectThemeMode(ThemeModePreference mode) async {
+    final AppPreferences repository =
+        ref.read(appPreferencesRepositoryProvider);
+    await repository.saveThemeMode(mode: mode);
+    state = AsyncData(
+      state.requireValue.copyWith(themeMode: mode),
     );
   }
 }
