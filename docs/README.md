@@ -15,5 +15,6 @@ This is the single source of project documentation, written in en-US.
 9. [`testing/test-strategy.md`](testing/test-strategy.md)
 10. [`device-testing/android-device-testing.md`](device-testing/android-device-testing.md)
 11. [`hosting/local-apk-server.md`](hosting/local-apk-server.md)
+12. [`planning/store-publication.md`](planning/store-publication.md) — store readiness checklist and history storage strategy
 
 The detailed implementation tasks are grouped under [`tasks/`](tasks/). Every task includes its objective, prerequisites, subtasks, expected files, acceptance criteria, tests, and out-of-scope items.
