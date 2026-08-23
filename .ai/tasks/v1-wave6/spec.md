@@ -79,3 +79,45 @@ Unit: CSV builder rows (all fields, pt-BR, header), controller states (idle→ex
 ## Versioned Handoff (opened)
 
 Depends on wave 5 (complete). New deps flagged for review per conventions (share_plus, flutter_local_notifications). Results appended at Wrap up.
+
+---
+
+## Execution record
+
+Implemented 2026-08-23; gate after each step: container `flutter analyze` clean, full suite **179/179**.
+
+### Export (commit 5fb6594)
+
+- `HistoryExportService` port + `HistoryExportController` (sealed `idle/exporting/ready/failure`, exportId-guarded listener).
+- `csv_history_exporter.dart` builds the CSV (useful info only: date, recommendation, prices, consumptions, ratio, threshold+source, costs/km, max ethanol price, difference; `;`-separated, pt-BR comma decimals, vehicle context line) as a pure function run through `compute` in `DartHistoryExportService` (isolate — UI never blocks); file written to a temp dir with BOM.
+- Delivery: `SystemExportNotifier` (flutter_local_notifications; channel `fuelwise_export`, `POST_NOTIFICATIONS` runtime-requested) + share sheet (`share_plus`) with the CSV — verified on device: system notification posted **and** Android share sheet opened (WhatsApp/Gmail/Telegram listed).
+- UI: month header and each entry get export actions; month sections **collapsed by default** (request 2). Deps pinned 13.3.0 / 22.3.0; core library desugaring enabled in gradle (plugin requirement).
+- Tests: CSV builder (header/columns, vehicle line, pt-BR decimals, empty optionals), controller states, history page icons + collapse/expand.
+
+### Form reset (request 1, commit c4750ec)
+
+- Home no longer prefills consumption from the profile (`ref.listen` + `_prefillFromProfile` removed). Fields start empty on every cold start; history persistence unchanged. Verified on device after restart: consumption fields empty; integration test now asserts empty fields despite a persisted profile.
+
+### Profile load error state (request 4, commit c4750ec)
+
+- `ProfilePage`: explicit error view + "Tentar novamente" (invalidate) when the provider is in `AsyncError`; tested with a flaky repository (error → retry → form).
+
+### HOST phase (commits 9b53289 + TLS follow-up)
+
+- `apk-server` compose service: nginx serving the download page (`docker/nginx/index.html`) and the APK dir at `/apk/`; HTTP `:8080` redirects to HTTPS `:8443` with a self-signed cert (Chrome blocks plain-HTTP APK downloads on modern Android — page + download must be HTTPS for the phone browser flow).
+- Docs: `docs/hosting/local-apk-server.md` rewritten per HOST-001..HOST-005 (artifact, server, phone-browser install/update, ADB alternative, offline checklist).
+
+### Device validation (requests 3/7; Moto G35 5G same Wi-Fi as host)
+
+- Page served over LAN from the phone browser; APK (220 MB) **downloaded over Wi-Fi** from the server.
+- Install caveats found on this device (not product bugs, recorded for the environment): the Itaú app hijacks `application/vnd.android.package-archive` VIEW intents; Android 15 `InstallStart` accepts `content://` grants (raw `file://` from shell is not resolved) and LMK kills the installer under memory pressure; sdcard file access from the shell install path denied (fuse) → install completed via `cmd package install` from `/data/local/tmp` after `am kill-all` freed RAM. Itaú was temporarily `pm disable-user`'d and re-`enable`d; handler table already preferred the system installer.
+- **HOST-005 offline scenario — all PASS with airplane mode on**: calculation + save; history grouped/collapsed by month; export of the month → system notification ("Exportação concluída") + share sheet with a correct CSV (spot-checked on disk: header, vehicle line, 6,29/4,59 pt-BR rows); confirmed deletion keeps the list updated; cold restart preserves history (5 entries) while the form starts empty; notification permission prompt appears on first export and works.
+
+### Tooling/docs (requests 5, 6)
+
+- Isolated commits `style(dart)` (5164c39, 604b8d3): formatter applied with zero logic changes.
+- `.ai/stack.md` refreshed (full V1 status, export deps, `apk-server` service, canonical commands) + stale test-count references swept from current docs.
+
+## Versioned Handoff (final)
+
+Wave 6 complete 2026-08-23. Wrap-up docs committed with this record. Remaining product backlog: none (dark-mode toggle done in wave 5). Next candidates from `docs/planning/store-publication.md`: HOST leftovers are done; pre-release tasks (release signing, EOL dep audit — sqlite3/ sqlcipher EOL, privacy policy, listing assets). Cavecrew reviewer/investigator still need an opencode server restart to pick up `opencode/big-pickle`.
