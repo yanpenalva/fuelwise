@@ -4,10 +4,6 @@ Fuelwise is an offline-first Flutter Android application that compares ethanol a
 
 The product is intentionally local: after installation, calculations, vehicle preferences, and history work without a backend, account, synchronization, or internet connection.
 
-## Current status
-
-ENV and V0 are complete. V1 is implemented and pushed on `main`: Riverpod state composition, Drift local persistence (schema v1, profile + history), persisted preferences, first-run welcome dialog, branded launch loading with the app motto, history screen with confirmed deletion, vehicle profile screen, and full offline device validation on a Moto G35 5G (airplane mode, dark mode, rotation). Product code follows [`docs/planning/execution-order.md`](docs/planning/execution-order.md).
-
 ## Product scope
 
 - Compare ethanol and gasoline prices.

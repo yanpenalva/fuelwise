@@ -11,8 +11,8 @@ Fuelwise is an offline-first Flutter Android application. No backend, no cloud, 
 | Riverpod `3.4.2` | State management (V1) | Implemented — preferences providers (V1 wave 1) |
 | Drift `2.34.3` + `drift_flutter 0.3.1` (+ `drift_dev` 2.34.5, `build_runner` 2.16.0) | Local persistence (V1) | Implemented — schema v1, profile persistence (V1 wave 2); history wiring pending (wave 3) |
 | shared_preferences `2.5.5` (`SharedPreferencesAsync`) | Lightweight preferences (V1) | Implemented — V1 wave 1 |
-| Docker + Docker Compose (`dev` service) | Reproducible dev environment | Implemented — image `fuelwise-dev`, smoke-tested 2026-08-22 |
-| Android SDK / Build Tools / NDK | APK builds inside container (API 36, minSdk 24) | Implemented; on-device install validated 2026-08-22 |
+| Docker + Docker Compose (`dev` service) | Reproducible dev environment | Implemented — image `fuelwise-dev`, smoke-tested |
+| Android SDK / Build Tools / NDK | APK builds inside container (API 36, minSdk 24) | Implemented; on-device install validated |
 
 Versions are pinned in the "Versions and prerequisites" section of `docs/planning/environment.md` (recorded by ENV-001). Do not assume a version that is not documented there.
 

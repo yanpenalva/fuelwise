@@ -4,7 +4,7 @@ This phase precedes V0. Its goal is reproducible development and testing through
 
 ## Versions and prerequisites
 
-All versions verified against the Flutter stable channel and Flutter `3.47.1` tooling sources on 2026-08-22.
+All versions verified against the Flutter stable channel and Flutter `3.47.1` tooling sources.
 
 ### Toolchain (installed inside the dev container)
 
@@ -87,12 +87,12 @@ docker volume rm fuelwise_pub_cache                             # reset pub cach
 - `ENV-002` Create the development Docker image. (done)
 - `ENV-003` Create Docker Compose. (done)
 - `ENV-004` Standardize commands. (done)
-- `ENV-005` Configure physical-device testing. (done — validated on Moto G35 5G via host ADB)
-- `ENV-006` Run the environment smoke test. (done — full container-to-device flow passed 2026-08-22)
+- `ENV-005` Configure physical-device testing. (done — validated on an Android phone via host ADB)
+- `ENV-006` Run the environment smoke test. (done — full container-to-device flow passed)
 
 ## Smoke test results
 
-Executed on 2026-08-22 against the minimal Flutter scaffold (`flutter create --platforms android .`, package `br.com.fuelwise/fuelwise`):
+Executed against the minimal Flutter scaffold (`flutter create --platforms android .`, package `br.com.fuelwise/fuelwise`):
 
 | Step | Result |
 |------|--------|
@@ -102,7 +102,7 @@ Executed on 2026-08-22 against the minimal Flutter scaffold (`flutter create --p
 | `flutter analyze` | No issues found |
 | `flutter test` | All tests passed |
 | `flutter build apk --debug` | Passed — `build/app/outputs/flutter-apk/app-debug.apk` (143.4 MB, Gradle assembleDebug ~232 s) |
-| Install on phone via host ADB | **Passed** 2026-08-22 — Moto G35 5G (`adb install -r`, streamed install success) |
+| Install on phone via host ADB | **Passed** — physical device (`adb install -r`, streamed install success) |
 | Launch on device | **Passed** — app process `br.com.fuelwise.fuelwise` confirmed running |
 
 Note: the first scaffold derived the project name from the container working directory (`/workdir` → package `br.com.fuelwise.workdir`). It was regenerated with an explicit `--project-name fuelwise`; always pass this flag when scaffolding.

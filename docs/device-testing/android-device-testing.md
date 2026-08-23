@@ -1,6 +1,6 @@
 # Android Device Testing
 
-Status: validated 2026-08-22. APK generated in Docker and installed on a Moto G35 5G via host ADB; app launch confirmed on device.
+Status: validated. APK generated in Docker and installed on a physical Android phone via host ADB; app launch confirmed on device.
 
 ## Responsibility split
 
