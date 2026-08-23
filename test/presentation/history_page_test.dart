@@ -78,6 +78,11 @@ Future<void> _pumpHistoryPage(
   );
 }
 
+Future<void> _expandMonth(WidgetTester tester, String month) async {
+  await tester.tap(find.text(month));
+  await tester.pumpAndSettle();
+}
+
 void main() {
  setUpAll(() {
     initializeDateFormatting('pt_BR');
@@ -113,6 +118,10 @@ void main() {
     await _pumpHistoryPage(tester, repository);
     await tester.pumpAndSettle();
 
+    expect(find.text('21/08/2026 09:15'), findsNothing);
+
+    await _expandMonth(tester, 'Agosto de 2026');
+
     expect(find.text('21/08/2026 09:15'), findsOneWidget);
     expect(find.text('20/08/2026 14:30'), findsOneWidget);
     expect(find.text('Gasolina: R\$ 6,29'), findsOneWidget);
@@ -130,7 +139,7 @@ void main() {
     expect(newerDy, lessThan(olderDy));
   });
 
-  testWidgets('groups entries by month with expandable headers',
+  testWidgets('groups entries by month with collapsed-by-default headers',
       (tester) async {
     final _FakeCalculationHistoryRepository repository =
         _FakeCalculationHistoryRepository()
@@ -156,15 +165,37 @@ void main() {
     expect(find.text('2 registros'), findsOneWidget);
     expect(find.text('Julho de 2026'), findsOneWidget);
     expect(find.text('1 registro'), findsOneWidget);
-    expect(find.text('21/08/2026 09:15'), findsOneWidget);
-    expect(find.text('05/07/2026 10:00'), findsOneWidget);
+    expect(find.text('21/08/2026 09:15'), findsNothing);
+    expect(find.text('05/07/2026 10:00'), findsNothing);
 
-    await tester.tap(find.text('Agosto de 2026'));
+    await _expandMonth(tester, 'Agosto de 2026');
+
+    expect(find.text('21/08/2026 09:15'), findsOneWidget);
+    expect(find.text('20/08/2026 14:30'), findsOneWidget);
+    expect(find.text('05/07/2026 10:00'), findsNothing);
+
+    await _expandMonth(tester, 'Julho de 2026');
+
+    expect(find.text('05/07/2026 10:00'), findsOneWidget);
+  });
+
+  testWidgets('shows export actions for months and entries', (tester) async {
+    final _FakeCalculationHistoryRepository repository =
+        _FakeCalculationHistoryRepository()
+          ..entries = <CalculationHistoryEntry>[
+            _buildEntry(id: 2, createdAt: DateTime(2026, 8, 21, 9, 15)),
+            _buildEntry(id: 1),
+          ];
+
+    await _pumpHistoryPage(tester, repository);
     await tester.pumpAndSettle();
 
-    expect(find.text('21/08/2026 09:15'), findsNothing);
-    expect(find.text('20/08/2026 14:30'), findsNothing);
-    expect(find.text('05/07/2026 10:00'), findsOneWidget);
+    expect(find.byIcon(Icons.ios_share), findsOneWidget);
+
+    await _expandMonth(tester, 'Agosto de 2026');
+
+    expect(find.byIcon(Icons.ios_share), findsNWidgets(3));
+    expect(find.byIcon(Icons.delete_outline), findsNWidgets(2));
   });
 
   testWidgets('deletes entry after confirmation', (tester) async {
@@ -177,6 +208,8 @@ void main() {
 
     await _pumpHistoryPage(tester, repository);
     await tester.pumpAndSettle();
+
+    await _expandMonth(tester, 'Agosto de 2026');
 
     await tester.tap(find.byIcon(Icons.delete_outline).first);
     await tester.pumpAndSettle();
@@ -205,6 +238,8 @@ void main() {
     await _pumpHistoryPage(tester, repository);
     await tester.pumpAndSettle();
 
+    await _expandMonth(tester, 'Agosto de 2026');
+
     await tester.tap(find.byIcon(Icons.delete_outline));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Cancelar'));
@@ -222,6 +257,8 @@ void main() {
 
     await _pumpHistoryPage(tester, repository);
     await tester.pumpAndSettle();
+
+    await _expandMonth(tester, 'Agosto de 2026');
 
     await tester.tap(find.byIcon(Icons.delete_outline));
     await tester.pumpAndSettle();

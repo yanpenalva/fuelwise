@@ -4,11 +4,15 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../application/export/history_export_controller.dart';
 import '../../application/history/history_controller.dart';
+import '../../application/profile/vehicle_profile_controller.dart';
 import '../../domain/calculation_history_entry.dart';
 import '../../domain/fuel_type.dart';
 import '../../domain/threshold_source.dart';
+import '../../infrastructure/export/system_export_notifier.dart';
 
 class HistoryPage extends ConsumerWidget {
   const HistoryPage({super.key});
@@ -52,6 +56,31 @@ class HistoryPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<CalculationHistoryEntry>> history =
         ref.watch(historyProvider);
+    final String? vehicleName =
+        ref.watch(vehicleProfileProvider).value?.name;
+
+    ref.listen<HistoryExportStatus>(
+      historyExportProvider,
+      (HistoryExportStatus? previous, HistoryExportStatus next) {
+        if (next is HistoryExportReady &&
+            (previous is! HistoryExportReady ||
+                previous.exportId != next.exportId)) {
+          unawaited(_publishExport(context, ref, next));
+        }
+        if (next is HistoryExportFailure &&
+            (previous is! HistoryExportFailure ||
+                previous.exportId != next.exportId)) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Não foi possível exportar o histórico.'),
+              ),
+            );
+          }
+          unawaited(ref.read(historyExportProvider.notifier).reset());
+        }
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -63,9 +92,27 @@ class HistoryPage extends ConsumerWidget {
             _buildError(context, ref),
         data: (List<CalculationHistoryEntry> entries) => entries.isEmpty
             ? _buildEmpty(context)
-            : _buildList(context, ref, entries),
+            : _buildList(context, ref, entries, vehicleName),
       ),
     );
+  }
+
+  static Future<void> _publishExport(
+    BuildContext context,
+    WidgetRef ref,
+    HistoryExportReady ready,
+  ) async {
+    final SystemExportNotifier notifier = SystemExportNotifier();
+    final String fileName = ready.filePath.split('/').last;
+    await notifier.ensurePermission();
+    await notifier.notifyExportReady(fileName);
+    await SharePlus.instance.share(
+      ShareParams(
+        files: <XFile>[XFile(ready.filePath, mimeType: 'text/csv')],
+        subject: 'Fuelwise — Exportação do histórico',
+      ),
+    );
+    await ref.read(historyExportProvider.notifier).reset();
   }
 
   Widget _buildError(BuildContext context, WidgetRef ref) {
@@ -99,6 +146,7 @@ class HistoryPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<CalculationHistoryEntry> entries,
+    String? vehicleName,
   ) {
     final List<(String, List<CalculationHistoryEntry>)> months =
         _groupByMonth(entries);
@@ -114,6 +162,16 @@ class HistoryPage extends ConsumerWidget {
             entries: monthEntries,
             onDelete: (CalculationHistoryEntry entry) =>
                 unawaited(_confirmDelete(context, ref, entry)),
+            onExportEntry: (CalculationHistoryEntry entry) => unawaited(
+              ref
+                  .read(historyExportProvider.notifier)
+                  .export(entries: <CalculationHistoryEntry>[entry], vehicleName: vehicleName),
+            ),
+            onExportMonth: () => unawaited(
+              ref
+                  .read(historyExportProvider.notifier)
+                  .export(entries: monthEntries, vehicleName: vehicleName),
+            ),
           ),
       ],
     );
@@ -208,12 +266,16 @@ final class _MonthSection extends StatelessWidget {
     required this.count,
     required this.entries,
     required this.onDelete,
+    required this.onExportEntry,
+    required this.onExportMonth,
   });
 
   final String month;
   final int count;
   final List<CalculationHistoryEntry> entries;
   final void Function(CalculationHistoryEntry entry) onDelete;
+  final void Function(CalculationHistoryEntry entry) onExportEntry;
+  final VoidCallback onExportMonth;
 
   static String _capitalize(String value) {
     if (value.isEmpty) {
@@ -225,12 +287,22 @@ final class _MonthSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      initiallyExpanded: true,
       tilePadding: EdgeInsets.zero,
       shape: const Border(),
       collapsedShape: const Border(),
       title: Text(_capitalize(month)),
       subtitle: Text(count == 1 ? '1 registro' : '$count registros'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'Exportar mês',
+            onPressed: onExportMonth,
+          ),
+          const Icon(Icons.expand_more),
+        ],
+      ),
       children: <Widget>[
         for (final CalculationHistoryEntry entry in entries)
           Padding(
@@ -263,9 +335,19 @@ final class _MonthSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => onDelete(entry),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    IconButton(
+                      icon: const Icon(Icons.ios_share),
+                      tooltip: 'Exportar registro',
+                      onPressed: () => onExportEntry(entry),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () => onDelete(entry),
+                    ),
+                  ],
                 ),
               ),
             ),
