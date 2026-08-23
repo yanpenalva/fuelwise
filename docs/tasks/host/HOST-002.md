@@ -24,7 +24,7 @@ HOST-001 produced an APK artifact.
 
 ## Acceptance criteria
 
-The phone can open `http://HOST_IP:PORT`, download the APK, and the server exposes no application data.
+The phone can open `https://HOST_IP:8443` after accepting the local certificate warning, download the APK, and the server exposes no application data. HTTP port 8080 only redirects to HTTPS.
 
 ## Tests
 

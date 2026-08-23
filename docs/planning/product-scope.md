@@ -23,7 +23,8 @@ Fuelwise is an offline Flutter Android application that compares ethanol and gas
 
 - One vehicle only.
 - No real refueling records.
-- No export, maps, or geolocation.
+- CSV export is limited to one history entry or one calendar month.
+- No maps or geolocation.
 - No backend or synchronization.
 - No Flutter Web.
 - No app-store publishing in this delivery.

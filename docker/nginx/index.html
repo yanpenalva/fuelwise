@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en-US">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fuelwise — Instalação local</title>
+  <title>Fuelwise — Local installation</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
     .card { border: 1px solid #ddd; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; }
@@ -13,21 +13,22 @@
 </head>
 <body>
   <h1>Fuelwise</h1>
-  <p class="muted">Servidor local de instalação — use este link para instalar ou atualizar o aplicativo neste dispositivo.</p>
+  <p class="muted">Local installation server — use this page to install or update the application on this device.</p>
   <div class="card">
     <p><strong>App:</strong> Fuelwise</p>
-    <p><strong>Versão:</strong> v1.0.0</p>
-    <p><strong>Build:</strong> debug local</p>
-    <p><a class="button" href="/apk/app-debug.apk" download>Baixar APK (app-debug.apk)</a></p>
+    <p><strong>Version:</strong> v1.0.0</p>
+    <p><strong>Build:</strong> local debug</p>
+    <p><strong>Build date:</strong> __BUILD_DATE__</p>
+    <p><a class="button" href="/apk/app-debug.apk" download>Download APK (app-debug.apk)</a></p>
   </div>
   <div class="card">
-    <h2>Instruções</h2>
+    <h2>Instructions</h2>
     <ol>
-      <li>Conecte o celular à mesma rede Wi-Fi do computador.</li>
-      <li>Abra em <code>http://IP_DO_COMPUTADOR:8080</code> no navegador do celular.</li>
-      <li>Toque em <strong>Baixar APK</strong>.</li>
-      <li>Permita a instalação de fontes desconhecidas quando solicitado.</li>
-      <li>Abra o aplicativo. Para atualizar, basta repetir — os dados são preservados.</li>
+      <li>Connect the phone to the same Wi-Fi network as the computer.</li>
+      <li>Open <code>https://HOST_IP:8443</code> in the phone browser.</li>
+      <li>Accept the self-signed certificate warning, then tap <strong>Download APK</strong>.</li>
+      <li>Allow installation from this source when Android prompts you.</li>
+      <li>Open the application. Repeat the process to update; app data is preserved.</li>
     </ol>
   </div>
 </body>

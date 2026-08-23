@@ -13,7 +13,7 @@ V1 is functional and the Docker build works.
 - Define the initial debug build.
 - Generate the APK through Docker.
 - Mount or copy it to the served directory.
-- Add a page with name, version, and build date.
+- Add a page with name, version, and artifact build date generated from the APK.
 - Document the artifact source.
 
 ## Expected files

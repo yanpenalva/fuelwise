@@ -57,6 +57,8 @@ class HistoryPage extends ConsumerWidget {
     final AsyncValue<List<CalculationHistoryEntry>> history = ref.watch(
       historyProvider,
     );
+    final bool isExporting =
+        ref.watch(historyExportProvider) is HistoryExporting;
     final String? vehicleName = ref.watch(vehicleProfileProvider).value?.name;
 
     ref.listen<HistoryExportStatus>(historyExportProvider, (
@@ -90,7 +92,7 @@ class HistoryPage extends ConsumerWidget {
             _buildError(context, ref),
         data: (List<CalculationHistoryEntry> entries) => entries.isEmpty
             ? _buildEmpty(context)
-            : _buildList(context, ref, entries, vehicleName),
+            : _buildList(context, ref, entries, vehicleName, isExporting),
       ),
     );
   }
@@ -102,15 +104,50 @@ class HistoryPage extends ConsumerWidget {
   ) async {
     final SystemExportNotifier notifier = SystemExportNotifier();
     final String fileName = ready.filePath.split('/').last;
-    await notifier.ensurePermission();
-    await notifier.notifyExportReady(fileName);
-    await SharePlus.instance.share(
-      ShareParams(
-        files: <XFile>[XFile(ready.filePath, mimeType: 'text/csv')],
-        subject: 'Fuelwise — Exportação do histórico',
-      ),
-    );
-    await ref.read(historyExportProvider.notifier).reset();
+    String? notificationWarning;
+
+    try {
+      final bool permissionGranted = await notifier.ensurePermission();
+      if (permissionGranted) {
+        await notifier.notifyExportReady(fileName);
+      }
+      if (!permissionGranted) {
+        notificationWarning =
+            'Arquivo exportado, mas as notificações estão desativadas.';
+      }
+    } catch (_) {
+      notificationWarning =
+          'Arquivo exportado, mas não foi possível exibir a notificação.';
+    }
+
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          files: <XFile>[XFile(ready.filePath, mimeType: 'text/csv')],
+          subject: 'Fuelwise — Exportação do histórico',
+        ),
+      );
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'O arquivo foi gerado, mas não foi possível abrir o compartilhamento.',
+            ),
+          ),
+        );
+        await ref.read(historyExportProvider.notifier).reset();
+      }
+      return;
+    }
+
+    if (context.mounted && notificationWarning != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(notificationWarning)));
+    }
+    if (context.mounted) {
+      await ref.read(historyExportProvider.notifier).reset();
+    }
   }
 
   Widget _buildError(BuildContext context, WidgetRef ref) {
@@ -144,6 +181,7 @@ class HistoryPage extends ConsumerWidget {
     WidgetRef ref,
     List<CalculationHistoryEntry> entries,
     String? vehicleName,
+    bool isExporting,
   ) {
     final List<(String, List<CalculationHistoryEntry>)> months = _groupByMonth(
       entries,
@@ -160,19 +198,26 @@ class HistoryPage extends ConsumerWidget {
             entries: monthEntries,
             onDelete: (CalculationHistoryEntry entry) =>
                 unawaited(_confirmDelete(context, ref, entry)),
-            onExportEntry: (CalculationHistoryEntry entry) => unawaited(
-              ref
-                  .read(historyExportProvider.notifier)
-                  .export(
-                    entries: <CalculationHistoryEntry>[entry],
-                    vehicleName: vehicleName,
+            onExportEntry: isExporting
+                ? null
+                : (CalculationHistoryEntry entry) => unawaited(
+                    ref
+                        .read(historyExportProvider.notifier)
+                        .export(
+                          entries: <CalculationHistoryEntry>[entry],
+                          vehicleName: vehicleName,
+                        ),
                   ),
-            ),
-            onExportMonth: () => unawaited(
-              ref
-                  .read(historyExportProvider.notifier)
-                  .export(entries: monthEntries, vehicleName: vehicleName),
-            ),
+            onExportMonth: isExporting
+                ? null
+                : () => unawaited(
+                    ref
+                        .read(historyExportProvider.notifier)
+                        .export(
+                          entries: monthEntries,
+                          vehicleName: vehicleName,
+                        ),
+                  ),
           ),
       ],
     );
@@ -283,8 +328,8 @@ final class _MonthSection extends StatelessWidget {
   final int count;
   final List<CalculationHistoryEntry> entries;
   final void Function(CalculationHistoryEntry entry) onDelete;
-  final void Function(CalculationHistoryEntry entry) onExportEntry;
-  final VoidCallback onExportMonth;
+  final void Function(CalculationHistoryEntry entry)? onExportEntry;
+  final VoidCallback? onExportMonth;
 
   static String _capitalize(String value) {
     if (value.isEmpty) {
@@ -352,7 +397,7 @@ final class _MonthSection extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.ios_share),
                       tooltip: 'Exportar registro',
-                      onPressed: () => onExportEntry(entry),
+                      onPressed: () => onExportEntry?.call(entry),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline),

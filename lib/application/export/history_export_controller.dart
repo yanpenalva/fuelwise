@@ -52,12 +52,11 @@ class HistoryExportController extends Notifier<HistoryExportStatus> {
     required List<CalculationHistoryEntry> entries,
     required String? vehicleName,
   }) async {
-    final HistoryExportStatus current = state;
-    final int exportId = current is HistoryExporting
-        ? current.exportId
-        : _nextExportId;
+    if (state is HistoryExporting) {
+      return;
+    }
 
-    _nextExportId = exportId + 1;
+    final int exportId = _nextExportId++;
     state = HistoryExporting(exportId: exportId);
 
     try {

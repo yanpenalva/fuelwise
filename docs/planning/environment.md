@@ -16,7 +16,7 @@ All versions verified against the Flutter stable channel and Flutter `3.47.1` to
 | Gradle | `9.3.1` | Flutter app template default (`templateDefaultGradleVersion`) |
 | Android Gradle Plugin (AGP) | `9.1.0` | Flutter app template default (`templateAndroidGradlePluginVersion`) |
 | Kotlin Gradle Plugin | `2.4.0` | Flutter app template default (`templateKotlinGradlePluginVersion`) |
-| Android SDK Platform | API `36` | compileSdk/targetSdk defaults of Flutter 3.47.1 |
+| Android SDK Platform | API `35` and `36` | API 36 is compileSdk/targetSdk; API 35 is required by the current plugin graph |
 | Android SDK Build-Tools | `36.0.0` | Matches compileSdk 36; confirm exact revision during ENV-006 smoke test |
 | NDK (side by side) | `28.2.13676358` | Flutter 3.47.1 default (`ndkVersion`) |
 
@@ -101,7 +101,7 @@ Executed against the minimal Flutter scaffold (`flutter create --platforms andro
 | `flutter pub get` | Passed |
 | `flutter analyze` | No issues found |
 | `flutter test` | All tests passed |
-| `flutter build apk --debug` | Passed — `build/app/outputs/flutter-apk/app-debug.apk` (143.4 MB, Gradle assembleDebug ~232 s) |
+| `flutter build apk --debug` | Passed — `build/app/outputs/flutter-apk/app-debug.apk` (debug size varies by dependency graph; SDK platforms are preinstalled in the image) |
 | Install on phone via host ADB | **Passed** — physical device (`adb install -r`, streamed install success) |
 | Launch on device | **Passed** — app process `br.com.fuelwise.fuelwise` confirmed running |
 

@@ -13,9 +13,10 @@ The product is intentionally local: after installation, calculations, vehicle pr
 - Store one vehicle profile and calculation history locally in V1.
 - Show a branded loading state with the app motto on launch.
 - Accept dot or comma as decimal separator in consumption fields, formatted to pt-BR comma as the user types.
+- Export one history entry or one month as a local CSV with useful calculation details.
 - Generate and distribute a test APK locally over Wi-Fi after V1.
 
-The following are out of scope: backend services, cloud synchronization, multiple vehicles, real refueling records, exports, maps, geolocation, Flutter Web, public hosting, app-store publishing, and remote CI/CD.
+The following are out of scope: backend services, cloud synchronization, multiple vehicles, real refueling records, maps, geolocation, Flutter Web, public hosting, app-store publishing, and remote CI/CD.
 
 ## Development phases
 

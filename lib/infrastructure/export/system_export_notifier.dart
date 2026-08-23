@@ -20,6 +20,8 @@ final class SystemExportNotifier {
   }
 
   Future<bool> ensurePermission() async {
+    await initialize();
+
     final AndroidFlutterLocalNotificationsPlugin? android = _notifications
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin

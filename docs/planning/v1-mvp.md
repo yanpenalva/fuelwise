@@ -4,14 +4,14 @@
 
 - Persist a simple vehicle profile.
 - Persist the standard/custom mode preference.
-- Save and display calculation history.
+- Save, display, and export calculation history as a local CSV.
 - Delete history entries.
 - Compose application state with Riverpod.
 - Keep the application fully offline after installation.
 
 ## Exclusions
 
-V1 does not include multiple vehicles, synchronization, backend services, export, remote automation, or any runtime network dependency.
+V1 does not include multiple vehicles, synchronization, backend services, remote automation, or any runtime network dependency.
 
 ## Tasks
 

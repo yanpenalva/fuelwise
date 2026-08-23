@@ -12,8 +12,8 @@ Fuelwise is an offline-first Flutter Android application. No backend, no cloud, 
 | Drift `2.34.3` + `drift_flutter 0.3.1` (+ `drift_dev` 2.34.5, `build_runner` 2.16.0) | Local persistence (V1) | Implemented — schema v1, profile persistence, history repository + monthly export source |
 | shared_preferences `2.5.5` (`SharedPreferencesAsync`) | Lightweight preferences (V1) | Implemented — welcome flag, rule mode, threshold, theme mode |
 | `share_plus 13.3.0` + `flutter_local_notifications 22.3.0` | History export delivery | Implemented — CSV via share sheet + completion notification |
-| Docker + Docker Compose (`dev` + `apk-server` services) | Reproducible dev environment + local APK server | Implemented — `fuelwise-dev` image; nginx `apk-server` on port 8080 |
-| Android SDK / Build Tools / NDK | APK builds inside container (API 36, minSdk 24) | Implemented; on-device install validated |
+| Docker + Docker Compose (`dev` + `apk-server` services) | Reproducible dev environment + local APK server | Implemented — `fuelwise-dev` image; nginx redirects 8080 to HTTPS 8443 |
+| Android SDK / Build Tools / NDK | APK builds inside container (API 35/36, build-tools 36.0.0, minSdk 24) | Implemented; on-device install validated |
 
 Versions are pinned in the "Versions and prerequisites" section of `docs/planning/environment.md` (recorded by ENV-001). Do not assume a version that is not documented there.
 
@@ -46,6 +46,6 @@ docker compose run --rm dev flutter pub get
 docker compose run --rm dev flutter analyze
 docker compose run --rm dev flutter test
 docker compose run --rm dev flutter build apk --debug
-docker compose up -d apk-server        # local APK server (port 8080)
+docker compose up -d --force-recreate apk-server  # local APK server (HTTPS 8443; HTTP 8080 redirects)
 docker compose down                    # stop all services
 ```

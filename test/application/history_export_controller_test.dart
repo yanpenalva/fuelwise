@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fuelwise/application/export/history_export_controller.dart';
@@ -22,6 +24,20 @@ final class _FakeExportService implements HistoryExportService {
     exportedEntries = entries;
     exportedVehicleName = vehicleName;
     return '/tmp/fuelwise_export.csv';
+  }
+}
+
+final class _BlockingExportService implements HistoryExportService {
+  final Completer<String> completion = Completer<String>();
+  int callCount = 0;
+
+  @override
+  Future<String> exportCsv({
+    required List<CalculationHistoryEntry> entries,
+    required String? vehicleName,
+  }) {
+    callCount++;
+    return completion.future;
   }
 }
 
@@ -75,6 +91,32 @@ void main() {
       (state as HistoryExportFailure).message,
       'Não foi possível exportar o histórico.',
     );
+  });
+
+  test('ignores a second export while the first is running', () async {
+    final _BlockingExportService service = _BlockingExportService();
+    final ProviderContainer container = ProviderContainer(
+      overrides: [historyExportServiceProvider.overrideWithValue(service)],
+    );
+    addTearDown(container.dispose);
+
+    final HistoryExportController controller = container.read(
+      historyExportProvider.notifier,
+    );
+    final Future<void> firstExport = controller.export(
+      entries: const <CalculationHistoryEntry>[],
+      vehicleName: null,
+    );
+    final Future<void> secondExport = controller.export(
+      entries: const <CalculationHistoryEntry>[],
+      vehicleName: null,
+    );
+
+    expect(service.callCount, 1);
+
+    service.completion.complete('/tmp/fuelwise_export.csv');
+    await Future.wait(<Future<void>>[firstExport, secondExport]);
+    expect(container.read(historyExportProvider), isA<HistoryExportReady>());
   });
 
   test('reset returns to idle', () async {

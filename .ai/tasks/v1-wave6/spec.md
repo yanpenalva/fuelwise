@@ -52,7 +52,7 @@ Add background CSV export of history (single entry or whole month) with system n
 
 ## Non-goals
 
-Export to PDF/XLS; export-all-history (month-level max for now); scheduled exports; cloud anything; release signing (HOST phase keeps debug APK only, per HOST-001 out of scope).
+Export to PDF/XLS; exporting all history across multiple months (the implemented maximum is one month); scheduled exports; cloud anything; release signing (HOST phase keeps debug APK only, per HOST-001 out of scope).
 
 ## Affected files
 

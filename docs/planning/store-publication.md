@@ -17,7 +17,7 @@ Before any store submission, the following must be true:
 
 Pending phases in execution order:
 
-- **HOST phase** — local APK server and offline-device validation workflow (per `docs/hosting/local-apk-server.md` and `docs/planning/execution-order.md`).
+- **HOST phase** — local APK server and offline-device validation workflow (complete; see `docs/hosting/local-apk-server.md`).
 - **Pre-release** — release signing, dependency EOL resolution, release smoke, privacy policy draft, listing assets, versioning policy (semver; `lib/presentation/release/app_release.dart` and `pubspec.yaml` in sync).
 - **Submission** — internal testing track first, then closed testing, then staged production rollout.
 - **Post-launch** — crash/ANR monitoring without third-party services to keep offline-first; keep listing updated per release.
@@ -34,4 +34,4 @@ Storage estimate: each row is a text snapshot (~200–400 B); 500 rows ≈ 0.1�
 
 ## Out of scope
 
-Cloud sync/backup, exports, cross-device history, and remote monitoring remain out of scope for this publication cycle.
+Cloud sync/backup, cross-device history, and remote monitoring remain out of scope for this publication cycle. Local CSV history export is part of V1.

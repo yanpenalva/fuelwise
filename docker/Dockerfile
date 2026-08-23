@@ -29,7 +29,7 @@ RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
 ENV PATH=${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}
 
 RUN yes | sdkmanager --licenses > /dev/null && \
-    sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358" "platform-tools" "cmake;3.22.1" && \
+    sdkmanager "platforms;android-35" "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358" "platform-tools" "cmake;3.22.1" && \
     rm -rf ${ANDROID_HOME}/.temp ${ANDROID_HOME}/cmdline-tools/latest/lib/.tmp
 
 ARG FLUTTER_VERSION=3.47.1

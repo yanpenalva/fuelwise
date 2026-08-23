@@ -23,7 +23,7 @@ From the repository root:
 docker compose build dev
 ```
 
-Builds the `fuelwise-dev` image (~11 GB): Flutter 3.47.1, Dart 3.13.1, JDK 17, Android SDK API 36, Build-Tools 36.0.0, NDK 28.2.13676358, licenses pre-accepted, non-root user. Takes 10–20 minutes on the first run.
+Builds the `fuelwise-dev` image (~11 GB): Flutter 3.47.1, Dart 3.13.1, JDK 17, Android SDK APIs 35 and 36, Build-Tools 36.0.0, NDK 28.2.13676358, licenses pre-accepted, non-root user. Takes 10–20 minutes on the first run.
 
 Verify:
 
