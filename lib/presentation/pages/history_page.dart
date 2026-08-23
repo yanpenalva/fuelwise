@@ -17,8 +17,7 @@ import '../../infrastructure/export/system_export_notifier.dart';
 class HistoryPage extends ConsumerWidget {
   const HistoryPage({super.key});
 
-  static final DateFormat _dateFormat =
-      DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
+  static final DateFormat _dateFormat = DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
 
   static String _formatMoney(Decimal value) {
     return 'R\$ ${_formatScaled(value, 2)}';
@@ -31,8 +30,9 @@ class HistoryPage extends ConsumerWidget {
   static String _formatScaled(Decimal value, int scale) {
     final bool isNegative = value < Decimal.zero;
     final Decimal absolute = isNegative ? -value : value;
-    final BigInt smallestUnits =
-        (absolute * Decimal.fromInt(_pow10(scale))).round().toBigInt();
+    final BigInt smallestUnits = (absolute * Decimal.fromInt(_pow10(scale)))
+        .round()
+        .toBigInt();
     final String digits = smallestUnits.toString().padLeft(scale + 1, '0');
     final String intPart = digits.substring(0, digits.length - scale);
     final String fracPart = digits.substring(digits.length - scale);
@@ -54,38 +54,36 @@ class HistoryPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<CalculationHistoryEntry>> history =
-        ref.watch(historyProvider);
-    final String? vehicleName =
-        ref.watch(vehicleProfileProvider).value?.name;
-
-    ref.listen<HistoryExportStatus>(
-      historyExportProvider,
-      (HistoryExportStatus? previous, HistoryExportStatus next) {
-        if (next is HistoryExportReady &&
-            (previous is! HistoryExportReady ||
-                previous.exportId != next.exportId)) {
-          unawaited(_publishExport(context, ref, next));
-        }
-        if (next is HistoryExportFailure &&
-            (previous is! HistoryExportFailure ||
-                previous.exportId != next.exportId)) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Não foi possível exportar o histórico.'),
-              ),
-            );
-          }
-          unawaited(ref.read(historyExportProvider.notifier).reset());
-        }
-      },
+    final AsyncValue<List<CalculationHistoryEntry>> history = ref.watch(
+      historyProvider,
     );
+    final String? vehicleName = ref.watch(vehicleProfileProvider).value?.name;
+
+    ref.listen<HistoryExportStatus>(historyExportProvider, (
+      HistoryExportStatus? previous,
+      HistoryExportStatus next,
+    ) {
+      if (next is HistoryExportReady &&
+          (previous is! HistoryExportReady ||
+              previous.exportId != next.exportId)) {
+        unawaited(_publishExport(context, ref, next));
+      }
+      if (next is HistoryExportFailure &&
+          (previous is! HistoryExportFailure ||
+              previous.exportId != next.exportId)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Não foi possível exportar o histórico.'),
+            ),
+          );
+        }
+        unawaited(ref.read(historyExportProvider.notifier).reset());
+      }
+    });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Histórico'),
-      ),
+      appBar: AppBar(title: const Text('Histórico')),
       body: history.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (Object error, StackTrace stackTrace) =>
@@ -135,9 +133,8 @@ class HistoryPage extends ConsumerWidget {
     return Center(
       child: Text(
         'Nenhum cálculo salvo ainda.',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+        style: Theme.of(context).textTheme.bodyMedium
+            ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
       ),
     );
   }
@@ -148,8 +145,9 @@ class HistoryPage extends ConsumerWidget {
     List<CalculationHistoryEntry> entries,
     String? vehicleName,
   ) {
-    final List<(String, List<CalculationHistoryEntry>)> months =
-        _groupByMonth(entries);
+    final List<(String, List<CalculationHistoryEntry>)> months = _groupByMonth(
+      entries,
+    );
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -165,7 +163,10 @@ class HistoryPage extends ConsumerWidget {
             onExportEntry: (CalculationHistoryEntry entry) => unawaited(
               ref
                   .read(historyExportProvider.notifier)
-                  .export(entries: <CalculationHistoryEntry>[entry], vehicleName: vehicleName),
+                  .export(
+                    entries: <CalculationHistoryEntry>[entry],
+                    vehicleName: vehicleName,
+                  ),
             ),
             onExportMonth: () => unawaited(
               ref
@@ -198,8 +199,18 @@ class HistoryPage extends ConsumerWidget {
   }
 
   static const List<String> _monthNames = <String>[
-    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+    'janeiro',
+    'fevereiro',
+    'março',
+    'abril',
+    'maio',
+    'junho',
+    'julho',
+    'agosto',
+    'setembro',
+    'outubro',
+    'novembro',
+    'dezembro',
   ];
 
   static String _recommendationLabel(FuelType type) {
@@ -252,9 +263,7 @@ class HistoryPage extends ConsumerWidget {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não foi possível excluir o registro.'),
-        ),
+        const SnackBar(content: Text('Não foi possível excluir o registro.')),
       );
     }
   }
@@ -311,7 +320,9 @@ final class _MonthSection extends StatelessWidget {
               elevation: 0,
               margin: EdgeInsets.zero,
               child: ListTile(
-                title: Text(HistoryPage._dateFormat.format(entry.createdAt.toLocal())),
+                title: Text(
+                  HistoryPage._dateFormat.format(entry.createdAt.toLocal()),
+                ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 4,
@@ -319,9 +330,9 @@ final class _MonthSection extends StatelessWidget {
                     Text(
                       HistoryPage._recommendationLabel(entry.recommendedFuel),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     Text(
                       'Gasolina: ${HistoryPage._formatMoney(entry.gasolinePrice)}',

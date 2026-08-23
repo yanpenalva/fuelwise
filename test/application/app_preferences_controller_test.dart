@@ -71,24 +71,33 @@ void main() {
       const AppPreferencesData(hasSeenWelcome: true, ruleMode: RuleMode.custom),
     );
     final ProviderContainer container = ProviderContainer(
-      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(repository),
+      ],
     );
     addTearDown(container.dispose);
 
-    expect(container.read(appPreferencesProvider), isA<AsyncLoading<AppPreferencesData>>());
+    expect(
+      container.read(appPreferencesProvider),
+      isA<AsyncLoading<AppPreferencesData>>(),
+    );
 
-    final AppPreferencesData data =
-        await container.read(appPreferencesProvider.future);
+    final AppPreferencesData data = await container.read(
+      appPreferencesProvider.future,
+    );
 
     expect(data.hasSeenWelcome, isTrue);
     expect(data.ruleMode, RuleMode.custom);
   });
 
   test('markWelcomeSeen persists true and updates state', () async {
-    final _InMemoryAppPreferences repository =
-        _InMemoryAppPreferences(const AppPreferencesData.defaults());
+    final _InMemoryAppPreferences repository = _InMemoryAppPreferences(
+      const AppPreferencesData.defaults(),
+    );
     final ProviderContainer container = ProviderContainer(
-      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(repository),
+      ],
     );
     addTearDown(container.dispose);
     await container.read(appPreferencesProvider.future);
@@ -96,16 +105,20 @@ void main() {
     await container.read(appPreferencesProvider.notifier).markWelcomeSeen();
 
     expect(repository.savedWelcomeSeen, isTrue);
-    final AppPreferencesData state =
-        container.read(appPreferencesProvider).requireValue;
+    final AppPreferencesData state = container
+        .read(appPreferencesProvider)
+        .requireValue;
     expect(state.hasSeenWelcome, isTrue);
   });
 
   test('selectRule persists custom mode and updates state', () async {
-    final _InMemoryAppPreferences repository =
-        _InMemoryAppPreferences(const AppPreferencesData.defaults());
+    final _InMemoryAppPreferences repository = _InMemoryAppPreferences(
+      const AppPreferencesData.defaults(),
+    );
     final ProviderContainer container = ProviderContainer(
-      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(repository),
+      ],
     );
     addTearDown(container.dispose);
     await container.read(appPreferencesProvider.future);
@@ -115,16 +128,20 @@ void main() {
         .selectRule(RuleMode.custom);
 
     expect(repository.savedRuleMode, RuleMode.custom);
-    final AppPreferencesData state =
-        container.read(appPreferencesProvider).requireValue;
+    final AppPreferencesData state = container
+        .read(appPreferencesProvider)
+        .requireValue;
     expect(state.ruleMode, RuleMode.custom);
   });
 
   test('setCustomThreshold persists value and updates state', () async {
-    final _InMemoryAppPreferences repository =
-        _InMemoryAppPreferences(const AppPreferencesData.defaults());
+    final _InMemoryAppPreferences repository = _InMemoryAppPreferences(
+      const AppPreferencesData.defaults(),
+    );
     final ProviderContainer container = ProviderContainer(
-      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(repository),
+      ],
     );
     addTearDown(container.dispose);
     await container.read(appPreferencesProvider.future);
@@ -134,21 +151,26 @@ void main() {
         .setCustomThreshold(Decimal.parse('0.75'));
 
     expect(repository.savedCustomThreshold, Decimal.parse('0.75'));
-    final AppPreferencesData state =
-        container.read(appPreferencesProvider).requireValue;
+    final AppPreferencesData state = container
+        .read(appPreferencesProvider)
+        .requireValue;
     expect(state.customThreshold, Decimal.parse('0.75'));
   });
 
   test('setCustomThreshold with null clears stored threshold', () async {
-    final _InMemoryAppPreferences repository =
-        _InMemoryAppPreferences(const AppPreferencesData.defaults());
+    final _InMemoryAppPreferences repository = _InMemoryAppPreferences(
+      const AppPreferencesData.defaults(),
+    );
     final ProviderContainer container = ProviderContainer(
-      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(repository),
+      ],
     );
     addTearDown(container.dispose);
     await container.read(appPreferencesProvider.future);
-    final AppPreferencesController controller =
-        container.read(appPreferencesProvider.notifier);
+    final AppPreferencesController controller = container.read(
+      appPreferencesProvider.notifier,
+    );
     await controller.setCustomThreshold(Decimal.parse('0.75'));
 
     await controller.setCustomThreshold(null);
@@ -161,10 +183,13 @@ void main() {
   });
 
   test('selectThemeMode persists and updates state', () async {
-    final _InMemoryAppPreferences repository =
-        _InMemoryAppPreferences(const AppPreferencesData.defaults());
+    final _InMemoryAppPreferences repository = _InMemoryAppPreferences(
+      const AppPreferencesData.defaults(),
+    );
     final ProviderContainer container = ProviderContainer(
-      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(repository),
+      ],
     );
     addTearDown(container.dispose);
     await container.read(appPreferencesProvider.future);
@@ -174,8 +199,9 @@ void main() {
         .selectThemeMode(ThemeModePreference.dark);
 
     expect(repository.savedThemeMode, ThemeModePreference.dark);
-    final AppPreferencesData state =
-        container.read(appPreferencesProvider).requireValue;
+    final AppPreferencesData state = container
+        .read(appPreferencesProvider)
+        .requireValue;
     expect(state.themeMode, ThemeModePreference.dark);
   });
 
@@ -192,8 +218,9 @@ void main() {
     container.read(appPreferencesProvider);
     await Future<void>.delayed(Duration.zero);
 
-    final AsyncValue<AppPreferencesData> state =
-        container.read(appPreferencesProvider);
+    final AsyncValue<AppPreferencesData> state = container.read(
+      appPreferencesProvider,
+    );
     expect(state.hasError, isTrue);
     expect(state.error, isException);
   });

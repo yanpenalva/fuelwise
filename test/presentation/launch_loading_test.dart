@@ -59,20 +59,14 @@ void main() {
       preferences.complete();
       await tester.pump(const Duration(milliseconds: 600));
 
-      expect(
-        find.text('Combustível certo, custo consciente.'),
-        findsOneWidget,
-      );
+      expect(find.text('Combustível certo, custo consciente.'), findsOneWidget);
       expect(find.byType(FuelInputField), findsNothing);
 
       await tester.pump(const Duration(milliseconds: 600));
       await tester.pumpAndSettle();
 
       expect(find.byType(FuelInputField), findsNWidgets(4));
-      expect(
-        find.text('Combustível certo, custo consciente.'),
-        findsNothing,
-      );
+      expect(find.text('Combustível certo, custo consciente.'), findsNothing);
     },
   );
 }

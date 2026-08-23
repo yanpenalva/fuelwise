@@ -6,7 +6,7 @@ import 'package:fuelwise/application/preferences/theme_mode_preference.dart';
 
 final class FakeAppPreferences implements AppPreferences {
   FakeAppPreferences({AppPreferencesData? initial})
-      : _data = initial ?? const AppPreferencesData.defaults();
+    : _data = initial ?? const AppPreferencesData.defaults();
 
   AppPreferencesData _data;
   int welcomeSeenSaveCount = 0;

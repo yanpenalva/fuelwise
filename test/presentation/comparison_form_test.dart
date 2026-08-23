@@ -42,69 +42,65 @@ Future<void> _submit(WidgetTester tester) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets(
-    'shows required error when submitting masked-empty price field',
-    (WidgetTester tester) async {
-      await _pumpHomePage(tester);
+  testWidgets('shows required error when submitting masked-empty price field', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHomePage(tester);
 
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-        ',',
-      );
-      await _submit(tester);
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+      ',',
+    );
+    await _submit(tester);
 
-      expect(find.text(FuelInputMessages.required), findsNWidgets(2));
-    },
-  );
+    expect(find.text(FuelInputMessages.required), findsNWidgets(2));
+  });
 
-  testWidgets(
-    'shows greater-than-zero error when submitting a zero price',
-    (WidgetTester tester) async {
-      await _pumpHomePage(tester);
+  testWidgets('shows greater-than-zero error when submitting a zero price', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHomePage(tester);
 
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-        '0',
-      );
-      await _submit(tester);
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+      '0',
+    );
+    await _submit(tester);
 
-      expect(find.text(FuelInputMessages.greaterThanZero), findsOneWidget);
-    },
-  );
+    expect(find.text(FuelInputMessages.greaterThanZero), findsOneWidget);
+  });
 
-  testWidgets(
-    'shows required error when submitting empty required field',
-    (WidgetTester tester) async {
-      await _pumpHomePage(tester);
+  testWidgets('shows required error when submitting empty required field', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHomePage(tester);
 
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-        '4,50',
-      );
-      await _submit(tester);
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+      '4,50',
+    );
+    await _submit(tester);
 
-      expect(find.text(FuelInputMessages.required), findsOneWidget);
-    },
-  );
+    expect(find.text(FuelInputMessages.required), findsOneWidget);
+  });
 
-  testWidgets(
-    'shows ResultView after valid submission with only prices',
-    (WidgetTester tester) async {
-      await _pumpHomePage(tester);
+  testWidgets('shows ResultView after valid submission with only prices', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHomePage(tester);
 
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-        '4,50',
-      );
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço do etanol'),
-        '3,00',
-      );
-      await _submit(tester);
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+      '4,50',
+    );
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço do etanol'),
+      '3,00',
+    );
+    await _submit(tester);
 
-      expect(find.byType(ResultView), findsOneWidget);
-    },
-  );
+    expect(find.byType(ResultView), findsOneWidget);
+  });
 
   testWidgets(
     'shows ResultView after valid submission with both consumptions',
@@ -135,80 +131,75 @@ void main() {
     },
   );
 
-  testWidgets(
-    'accepts comma decimal separator on submission',
-    (WidgetTester tester) async {
-      await _pumpHomePage(tester);
+  testWidgets('accepts comma decimal separator on submission', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHomePage(tester);
 
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-        '4,20',
-      );
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço do etanol'),
-        '2,80',
-      );
-      await _submit(tester);
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+      '4,20',
+    );
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço do etanol'),
+      '2,80',
+    );
+    await _submit(tester);
 
-      expect(find.byType(ResultView), findsOneWidget);
-    },
-  );
+    expect(find.byType(ResultView), findsOneWidget);
+  });
 
-  testWidgets(
-    'formats currency input while typing',
-    (WidgetTester tester) async {
-      await _pumpHomePage(tester);
+  testWidgets('formats currency input while typing', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHomePage(tester);
 
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-        '123456',
-      );
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+      '123456',
+    );
 
-      final FuelInputField field = tester.widget<FuelInputField>(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-      );
+    final FuelInputField field = tester.widget<FuelInputField>(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+    );
 
-      expect(field.controller.text, '1.234,56');
-    },
-  );
+    expect(field.controller.text, '1.234,56');
+  });
 
-  testWidgets(
-    'renders form without overflow on narrow surface',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(320, 640);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('renders form without overflow on narrow surface', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
-      await _pumpHomePage(tester);
-      expect(tester.takeException(), isNull);
-    },
-  );
+    await _pumpHomePage(tester);
+    expect(tester.takeException(), isNull);
+  });
 
-  testWidgets(
-    'returns to empty form when tapping new calculation',
-    (WidgetTester tester) async {
-      await _pumpHomePage(tester);
+  testWidgets('returns to empty form when tapping new calculation', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHomePage(tester);
 
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-        '4,50',
-      );
-      await tester.enterText(
-        find.widgetWithText(FuelInputField, 'Preço do etanol'),
-        '3,00',
-      );
-      await _submit(tester);
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+      '4,50',
+    );
+    await tester.enterText(
+      find.widgetWithText(FuelInputField, 'Preço do etanol'),
+      '3,00',
+    );
+    await _submit(tester);
 
-      await tester.tap(find.text('Novo cálculo'));
-      await tester.pump();
+    await tester.tap(find.text('Novo cálculo'));
+    await tester.pump();
 
-      expect(find.byType(ResultView), findsNothing);
-      final FuelInputField gasolinePriceField =
-          tester.widget<FuelInputField>(
-        find.widgetWithText(FuelInputField, 'Preço da gasolina'),
-      );
-      expect(gasolinePriceField.controller.text, isEmpty);
-    },
-  );
+    expect(find.byType(ResultView), findsNothing);
+    final FuelInputField gasolinePriceField = tester.widget<FuelInputField>(
+      find.widgetWithText(FuelInputField, 'Preço da gasolina'),
+    );
+    expect(gasolinePriceField.controller.text, isEmpty);
+  });
 }

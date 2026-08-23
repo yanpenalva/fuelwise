@@ -126,44 +126,42 @@ void main() {
     },
   );
 
-  testWidgets(
-    'shows greater-than-zero error when a price is zero',
-    (WidgetTester tester) async {
-      await _pumpApp(tester);
+  testWidgets('shows greater-than-zero error when a price is zero', (
+    WidgetTester tester,
+  ) async {
+    await _pumpApp(tester);
 
-      await _enterPrice(tester, _gasolinePriceLabel, '0');
-      await tester.tap(find.text(_submitButton), warnIfMissed: false);
-      await tester.pump();
+    await _enterPrice(tester, _gasolinePriceLabel, '0');
+    await tester.tap(find.text(_submitButton), warnIfMissed: false);
+    await tester.pump();
 
-      expect(find.text(FuelInputMessages.greaterThanZero), findsOneWidget);
-      expect(find.byType(ResultView), findsNothing);
-    },
-  );
+    expect(find.text(FuelInputMessages.greaterThanZero), findsOneWidget);
+    expect(find.byType(ResultView), findsNothing);
+  });
 
-  testWidgets(
-    'returns to cleared form after new calculation from result',
-    (WidgetTester tester) async {
-      await _pumpApp(tester);
+  testWidgets('returns to cleared form after new calculation from result', (
+    WidgetTester tester,
+  ) async {
+    await _pumpApp(tester);
 
-      await _enterPrice(tester, _gasolinePriceLabel, '6,00');
-      await _enterPrice(tester, _ethanolPriceLabel, '4,19');
-      await _submit(tester);
+    await _enterPrice(tester, _gasolinePriceLabel, '6,00');
+    await _enterPrice(tester, _ethanolPriceLabel, '4,19');
+    await _submit(tester);
 
-      await tester.tap(find.text(_newCalculationButton));
-      await tester.pump();
+    await tester.tap(find.text(_newCalculationButton));
+    await tester.pump();
 
-      expect(find.byType(ResultView), findsNothing);
-      final FuelInputField gasolinePriceField = tester
-          .widget<FuelInputField>(find.widgetWithText(FuelInputField, _gasolinePriceLabel));
-      final FuelInputField ethanolPriceField =
-          tester.widget<FuelInputField>(
-        find.widgetWithText(FuelInputField, _ethanolPriceLabel),
-      );
-      expect(gasolinePriceField.controller.text, isEmpty);
-      expect(ethanolPriceField.controller.text, isEmpty);
-      expect(find.text(_standardRuleSegment), findsOneWidget);
-    },
-  );
+    expect(find.byType(ResultView), findsNothing);
+    final FuelInputField gasolinePriceField = tester.widget<FuelInputField>(
+      find.widgetWithText(FuelInputField, _gasolinePriceLabel),
+    );
+    final FuelInputField ethanolPriceField = tester.widget<FuelInputField>(
+      find.widgetWithText(FuelInputField, _ethanolPriceLabel),
+    );
+    expect(gasolinePriceField.controller.text, isEmpty);
+    expect(ethanolPriceField.controller.text, isEmpty);
+    expect(find.text(_standardRuleSegment), findsOneWidget);
+  });
 
   testWidgets(
     'completes the happy path without layout exceptions on a 320px screen',

@@ -11,7 +11,10 @@ import 'package:fuelwise/domain/vehicle_efficiency.dart';
 void main() {
   group('FuelPrice', () {
     test('accepts a positive value', () {
-      final price = FuelPrice(type: FuelType.gasoline, value: Decimal.parse('6.19'));
+      final price = FuelPrice(
+        type: FuelType.gasoline,
+        value: Decimal.parse('6.19'),
+      );
 
       expect(price.value, Decimal.parse('6.19'));
     });
@@ -28,23 +31,37 @@ void main() {
     });
 
     test('supports equality', () {
-      final price = FuelPrice(type: FuelType.gasoline, value: Decimal.parse('6.19'));
+      final price = FuelPrice(
+        type: FuelType.gasoline,
+        value: Decimal.parse('6.19'),
+      );
 
-      expect(price, FuelPrice(type: FuelType.gasoline, value: Decimal.parse('6.19')));
-      expect(price, isNot(FuelPrice(type: FuelType.ethanol, value: Decimal.parse('6.19'))));
+      expect(
+        price,
+        FuelPrice(type: FuelType.gasoline, value: Decimal.parse('6.19')),
+      );
+      expect(
+        price,
+        isNot(FuelPrice(type: FuelType.ethanol, value: Decimal.parse('6.19'))),
+      );
     });
   });
 
   group('VehicleEfficiency', () {
     test('accepts partial data with one consumption value', () {
-      final efficiency = VehicleEfficiency(gasolineKmPerLiter: Decimal.parse('10'));
+      final efficiency = VehicleEfficiency(
+        gasolineKmPerLiter: Decimal.parse('10'),
+      );
 
       expect(efficiency.isComplete, isFalse);
     });
 
     test('rejects empty data', () {
       expect(
-        () => VehicleEfficiency(gasolineKmPerLiter: null, ethanolKmPerLiter: null),
+        () => VehicleEfficiency(
+          gasolineKmPerLiter: null,
+          ethanolKmPerLiter: null,
+        ),
         throwsArgumentError,
       );
     });
@@ -60,8 +77,14 @@ void main() {
   group('FuelCalculationInput', () {
     test('computes ratio as ethanol price divided by gasoline price', () {
       final input = FuelCalculationInput(
-        gasolinePrice: FuelPrice(type: FuelType.gasoline, value: Decimal.parse('6.00')),
-        ethanolPrice: FuelPrice(type: FuelType.ethanol, value: Decimal.parse('4.20')),
+        gasolinePrice: FuelPrice(
+          type: FuelType.gasoline,
+          value: Decimal.parse('6.00'),
+        ),
+        ethanolPrice: FuelPrice(
+          type: FuelType.ethanol,
+          value: Decimal.parse('4.20'),
+        ),
       );
 
       expect(input.ratio, Rational.fromInt(7, 10));
@@ -72,8 +95,14 @@ void main() {
         gasolineKmPerLiter: Decimal.parse('10'),
         ethanolKmPerLiter: Decimal.parse('7'),
       );
-      final gasoline = FuelPrice(type: FuelType.gasoline, value: Decimal.parse('6'));
-      final ethanol = FuelPrice(type: FuelType.ethanol, value: Decimal.parse('4.2'));
+      final gasoline = FuelPrice(
+        type: FuelType.gasoline,
+        value: Decimal.parse('6'),
+      );
+      final ethanol = FuelPrice(
+        type: FuelType.ethanol,
+        value: Decimal.parse('4.2'),
+      );
       final input = FuelCalculationInput(
         gasolinePrice: gasoline,
         ethanolPrice: ethanol,

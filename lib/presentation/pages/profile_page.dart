@@ -12,19 +12,18 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<VehicleProfile?> state =
-        ref.watch(vehicleProfileProvider);
+    final AsyncValue<VehicleProfile?> state = ref.watch(vehicleProfileProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Meu veículo'),
-      ),
+      appBar: AppBar(title: const Text('Meu veículo')),
       body: switch (state) {
-        AsyncLoading<VehicleProfile?>() =>
-          const Center(child: CircularProgressIndicator()),
+        AsyncLoading<VehicleProfile?>() => const Center(
+          child: CircularProgressIndicator(),
+        ),
         AsyncError<VehicleProfile?>() => _buildLoadError(context, ref),
-        AsyncData<VehicleProfile?>() =>
-          _ProfileForm(initialProfile: state.value),
+        AsyncData<VehicleProfile?>() => _ProfileForm(
+          initialProfile: state.value,
+        ),
       },
     );
   }
@@ -111,10 +110,11 @@ class _ProfileFormState extends ConsumerState<_ProfileForm> {
     final Decimal? ethanol = _parseConsumption(_ethanolController.text);
 
     String? nameError;
-    String? gasolineError =
-        _consumptionError(_gasolineController.text, gasoline);
-    String? ethanolError =
-        _consumptionError(_ethanolController.text, ethanol);
+    String? gasolineError = _consumptionError(
+      _gasolineController.text,
+      gasoline,
+    );
+    String? ethanolError = _consumptionError(_ethanolController.text, ethanol);
 
     VehicleProfile? profile;
     try {
@@ -170,9 +170,8 @@ class _ProfileFormState extends ConsumerState<_ProfileForm> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Perfil salvo.')),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Perfil salvo.')));
     Navigator.of(context).pop();
   }
 

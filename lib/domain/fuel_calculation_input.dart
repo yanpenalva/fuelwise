@@ -28,9 +28,9 @@ class FuelCalculationInput {
 
   @override
   int get hashCode => Object.hash(
-        gasolinePrice,
-        ethanolPrice,
-        efficiency,
-        applyCustomThreshold,
-      );
+    gasolinePrice,
+    ethanolPrice,
+    efficiency,
+    applyCustomThreshold,
+  );
 }

@@ -84,7 +84,7 @@ Future<void> _expandMonth(WidgetTester tester, String month) async {
 }
 
 void main() {
- setUpAll(() {
+  setUpAll(() {
     initializeDateFormatting('pt_BR');
   });
 
@@ -98,8 +98,9 @@ void main() {
     expect(find.text('Nenhum cálculo salvo ainda.'), findsOneWidget);
   });
 
-  testWidgets('renders entries newest first with date and prices',
-      (tester) async {
+  testWidgets('renders entries newest first with date and prices', (
+    tester,
+  ) async {
     final _FakeCalculationHistoryRepository repository =
         _FakeCalculationHistoryRepository()
           ..entries = <CalculationHistoryEntry>[
@@ -109,10 +110,7 @@ void main() {
               gasolinePrice: Decimal.parse('5.99'),
               ethanolPrice: Decimal.parse('4.19'),
             ),
-            _buildEntry(
-              id: 1,
-              createdAt: DateTime(2026, 8, 20, 14, 30),
-            ),
+            _buildEntry(id: 1, createdAt: DateTime(2026, 8, 20, 14, 30)),
           ];
 
     await _pumpHistoryPage(tester, repository);
@@ -132,30 +130,20 @@ void main() {
     expect(find.textContaining('Proporção: 0,69'), findsNWidgets(2));
     expect(find.textContaining('Limiar padrão'), findsNWidgets(2));
 
-    final double newerDy =
-        tester.getTopLeft(find.text('21/08/2026 09:15')).dy;
-    final double olderDy =
-        tester.getTopLeft(find.text('20/08/2026 14:30')).dy;
+    final double newerDy = tester.getTopLeft(find.text('21/08/2026 09:15')).dy;
+    final double olderDy = tester.getTopLeft(find.text('20/08/2026 14:30')).dy;
     expect(newerDy, lessThan(olderDy));
   });
 
-  testWidgets('groups entries by month with collapsed-by-default headers',
-      (tester) async {
+  testWidgets('groups entries by month with collapsed-by-default headers', (
+    tester,
+  ) async {
     final _FakeCalculationHistoryRepository repository =
         _FakeCalculationHistoryRepository()
           ..entries = <CalculationHistoryEntry>[
-            _buildEntry(
-              id: 3,
-              createdAt: DateTime(2026, 8, 21, 9, 15),
-            ),
-            _buildEntry(
-              id: 2,
-              createdAt: DateTime(2026, 8, 20, 14, 30),
-            ),
-            _buildEntry(
-              id: 1,
-              createdAt: DateTime(2026, 7, 5, 10, 0),
-            ),
+            _buildEntry(id: 3, createdAt: DateTime(2026, 8, 21, 9, 15)),
+            _buildEntry(id: 2, createdAt: DateTime(2026, 8, 20, 14, 30)),
+            _buildEntry(id: 1, createdAt: DateTime(2026, 7, 5, 10, 0)),
           ];
 
     await _pumpHistoryPage(tester, repository);
@@ -221,7 +209,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      repository.entries.where((CalculationHistoryEntry entry) => entry.id == 2),
+      repository.entries.where(
+        (CalculationHistoryEntry entry) => entry.id == 2,
+      ),
       isEmpty,
     );
     expect(repository.entries.length, 1);
@@ -249,8 +239,9 @@ void main() {
     expect(find.byIcon(Icons.delete_outline), findsOneWidget);
   });
 
-  testWidgets('delete failure shows error SnackBar and keeps tile',
-      (tester) async {
+  testWidgets('delete failure shows error SnackBar and keeps tile', (
+    tester,
+  ) async {
     final _FakeCalculationHistoryRepository repository =
         _FakeCalculationHistoryRepository(failDelete: true)
           ..entries = <CalculationHistoryEntry>[_buildEntry(id: 1)];
@@ -265,10 +256,7 @@ void main() {
     await tester.tap(find.text('Excluir'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Não foi possível excluir o registro.'),
-      findsOneWidget,
-    );
+    expect(find.text('Não foi possível excluir o registro.'), findsOneWidget);
     expect(repository.entries.length, 1);
     expect(find.byIcon(Icons.delete_outline), findsOneWidget);
   });

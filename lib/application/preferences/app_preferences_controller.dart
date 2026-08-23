@@ -7,15 +7,13 @@ import 'rule_mode.dart';
 import 'theme_mode_preference.dart';
 
 final Provider<AppPreferences> appPreferencesRepositoryProvider =
-    Provider<AppPreferences>(
-  (Ref ref) => throw UnimplementedError(),
-);
+    Provider<AppPreferences>((Ref ref) => throw UnimplementedError());
 
 final AsyncNotifierProvider<AppPreferencesController, AppPreferencesData>
-    appPreferencesProvider =
+appPreferencesProvider =
     AsyncNotifierProvider<AppPreferencesController, AppPreferencesData>(
-  AppPreferencesController.new,
-);
+      AppPreferencesController.new,
+    );
 
 class AppPreferencesController extends AsyncNotifier<AppPreferencesData> {
   @override
@@ -24,26 +22,25 @@ class AppPreferencesController extends AsyncNotifier<AppPreferencesData> {
   }
 
   Future<void> markWelcomeSeen() async {
-    final AppPreferences repository =
-        ref.read(appPreferencesRepositoryProvider);
-    await repository.saveHasSeenWelcome(value: true);
-    state = AsyncData(
-      state.requireValue.copyWith(hasSeenWelcome: true),
+    final AppPreferences repository = ref.read(
+      appPreferencesRepositoryProvider,
     );
+    await repository.saveHasSeenWelcome(value: true);
+    state = AsyncData(state.requireValue.copyWith(hasSeenWelcome: true));
   }
 
   Future<void> selectRule(RuleMode mode) async {
-    final AppPreferences repository =
-        ref.read(appPreferencesRepositoryProvider);
-    await repository.saveRuleMode(mode: mode);
-    state = AsyncData(
-      state.requireValue.copyWith(ruleMode: mode),
+    final AppPreferences repository = ref.read(
+      appPreferencesRepositoryProvider,
     );
+    await repository.saveRuleMode(mode: mode);
+    state = AsyncData(state.requireValue.copyWith(ruleMode: mode));
   }
 
   Future<void> setCustomThreshold(Decimal? value) async {
-    final AppPreferences repository =
-        ref.read(appPreferencesRepositoryProvider);
+    final AppPreferences repository = ref.read(
+      appPreferencesRepositoryProvider,
+    );
     await repository.saveCustomThreshold(value: value);
     state = AsyncData(
       state.requireValue.copyWith(
@@ -54,11 +51,10 @@ class AppPreferencesController extends AsyncNotifier<AppPreferencesData> {
   }
 
   Future<void> selectThemeMode(ThemeModePreference mode) async {
-    final AppPreferences repository =
-        ref.read(appPreferencesRepositoryProvider);
-    await repository.saveThemeMode(mode: mode);
-    state = AsyncData(
-      state.requireValue.copyWith(themeMode: mode),
+    final AppPreferences repository = ref.read(
+      appPreferencesRepositoryProvider,
     );
+    await repository.saveThemeMode(mode: mode);
+    state = AsyncData(state.requireValue.copyWith(themeMode: mode));
   }
 }

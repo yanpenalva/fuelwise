@@ -124,16 +124,18 @@ void main() {
     expect(loaded.ruleMode, RuleMode.standard);
   });
 
-  test('parses custom threshold written with comma decimal separator',
-      () async {
-    store.values[PreferenceKeys.customThreshold] = '4,59';
-    final SharedPreferencesAppPreferences repository =
-        SharedPreferencesAppPreferences(store);
+  test(
+    'parses custom threshold written with comma decimal separator',
+    () async {
+      store.values[PreferenceKeys.customThreshold] = '4,59';
+      final SharedPreferencesAppPreferences repository =
+          SharedPreferencesAppPreferences(store);
 
-    final AppPreferencesData loaded = await repository.load();
+      final AppPreferencesData loaded = await repository.load();
 
-    expect(loaded.customThreshold, Decimal.parse('4.59'));
-  });
+      expect(loaded.customThreshold, Decimal.parse('4.59'));
+    },
+  );
 
   test('parses custom threshold written with dot decimal separator', () async {
     store.values[PreferenceKeys.customThreshold] = '4.59';
@@ -145,16 +147,18 @@ void main() {
     expect(loaded.customThreshold, Decimal.parse('4.59'));
   });
 
-  test('yields null custom threshold without throwing when stored malformed',
-      () async {
-    store.values[PreferenceKeys.customThreshold] = 'not-a-number';
-    final SharedPreferencesAppPreferences repository =
-        SharedPreferencesAppPreferences(store);
+  test(
+    'yields null custom threshold without throwing when stored malformed',
+    () async {
+      store.values[PreferenceKeys.customThreshold] = 'not-a-number';
+      final SharedPreferencesAppPreferences repository =
+          SharedPreferencesAppPreferences(store);
 
-    final AppPreferencesData loaded = await repository.load();
+      final AppPreferencesData loaded = await repository.load();
 
-    expect(loaded.customThreshold, isNull);
-  });
+      expect(loaded.customThreshold, isNull);
+    },
+  );
 
   test('yields null custom threshold when stored negative', () async {
     store.values[PreferenceKeys.customThreshold] = '-1';
@@ -176,16 +180,18 @@ void main() {
     expect(loaded.customThreshold, isNull);
   });
 
-  test('falls back to unseen welcome flag when stored value has wrong type',
-      () async {
-    store.values[PreferenceKeys.welcomeSeen] = 'yes';
-    final SharedPreferencesAppPreferences repository =
-        SharedPreferencesAppPreferences(store);
+  test(
+    'falls back to unseen welcome flag when stored value has wrong type',
+    () async {
+      store.values[PreferenceKeys.welcomeSeen] = 'yes';
+      final SharedPreferencesAppPreferences repository =
+          SharedPreferencesAppPreferences(store);
 
-    final AppPreferencesData loaded = await repository.load();
+      final AppPreferencesData loaded = await repository.load();
 
-    expect(loaded.hasSeenWelcome, isFalse);
-  });
+      expect(loaded.hasSeenWelcome, isFalse);
+    },
+  );
 
   test('round-trips theme mode write and read', () async {
     final SharedPreferencesAppPreferences repository =

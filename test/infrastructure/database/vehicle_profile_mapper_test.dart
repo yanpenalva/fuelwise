@@ -7,10 +7,7 @@ import 'package:fuelwise/infrastructure/database/vehicle_profile_mapper.dart';
 void main() {
   const VehicleProfileMapper mapper = VehicleProfileMapper();
 
-  VehicleProfileRow row({
-    String? gasoline,
-    String? ethanol,
-  }) {
+  VehicleProfileRow row({String? gasoline, String? ethanol}) {
     return VehicleProfileRow(
       id: 1,
       name: 'City car',

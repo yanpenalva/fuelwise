@@ -9,7 +9,7 @@ import 'preference_keys.dart';
 
 class SharedPreferencesAppPreferences implements AppPreferences {
   SharedPreferencesAppPreferences([SharedPreferencesAsync? preferences])
-      : preferences = preferences ?? SharedPreferencesAsync();
+    : preferences = preferences ?? SharedPreferencesAsync();
 
   final SharedPreferencesAsync preferences;
 
@@ -17,10 +17,12 @@ class SharedPreferencesAppPreferences implements AppPreferences {
   Future<AppPreferencesData> load() async {
     final bool welcomeSeen =
         await preferences.getBool(PreferenceKeys.welcomeSeen) ?? false;
-    final String? modeName =
-        await preferences.getString(PreferenceKeys.ruleMode);
-    final String? themeModeName =
-        await preferences.getString(PreferenceKeys.themeMode);
+    final String? modeName = await preferences.getString(
+      PreferenceKeys.ruleMode,
+    );
+    final String? themeModeName = await preferences.getString(
+      PreferenceKeys.themeMode,
+    );
     return AppPreferencesData(
       hasSeenWelcome: welcomeSeen,
       ruleMode: ruleModeFromName(modeName),
@@ -61,8 +63,7 @@ class SharedPreferencesAppPreferences implements AppPreferences {
     if (stored.isEmpty) {
       return null;
     }
-    final Decimal? parsed =
-        Decimal.tryParse(stored.replaceAll(',', '.'));
+    final Decimal? parsed = Decimal.tryParse(stored.replaceAll(',', '.'));
     if (parsed == null || parsed <= Decimal.zero) {
       return null;
     }

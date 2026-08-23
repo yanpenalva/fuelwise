@@ -43,19 +43,22 @@ void main() {
       );
     });
 
-    test('fails on zero and negative values with greater-than-zero message', () {
-      final zeroResult = parseRequiredPositiveDecimal('0');
-      final negativeResult = parseRequiredPositiveDecimal('-1');
+    test(
+      'fails on zero and negative values with greater-than-zero message',
+      () {
+        final zeroResult = parseRequiredPositiveDecimal('0');
+        final negativeResult = parseRequiredPositiveDecimal('-1');
 
-      expect(
-        zeroResult,
-        const FuelInputParseFailure(FuelInputMessages.greaterThanZero),
-      );
-      expect(
-        negativeResult,
-        const FuelInputParseFailure(FuelInputMessages.greaterThanZero),
-      );
-    });
+        expect(
+          zeroResult,
+          const FuelInputParseFailure(FuelInputMessages.greaterThanZero),
+        );
+        expect(
+          negativeResult,
+          const FuelInputParseFailure(FuelInputMessages.greaterThanZero),
+        );
+      },
+    );
   });
 
   group('parseOptionalPositiveDecimal', () {
@@ -95,17 +98,19 @@ void main() {
   });
 
   group('FuelInputParseResult types', () {
-    test('success supports equality and distinguishes null from zero-like values',
-        () {
-      expect(
-        const FuelInputParseSuccess(null),
-        const FuelInputParseSuccess(null),
-      );
-      expect(
-        const FuelInputParseSuccess(null),
-        isNot(FuelInputParseSuccess(Decimal.zero)),
-      );
-    });
+    test(
+      'success supports equality and distinguishes null from zero-like values',
+      () {
+        expect(
+          const FuelInputParseSuccess(null),
+          const FuelInputParseSuccess(null),
+        );
+        expect(
+          const FuelInputParseSuccess(null),
+          isNot(FuelInputParseSuccess(Decimal.zero)),
+        );
+      },
+    );
 
     test('failure supports equality by message', () {
       expect(
@@ -126,12 +131,11 @@ void main() {
     });
 
     test('exhaustive switch over result subtypes compiles', () {
-      final FuelInputParseResult result =
-          parseRequiredPositiveDecimal('6,19');
+      final FuelInputParseResult result = parseRequiredPositiveDecimal('6,19');
       String describe(FuelInputParseResult value) => switch (value) {
-            FuelInputParseSuccess(:final value) => value.toString(),
-            FuelInputParseFailure(:final userMessage) => userMessage,
-          };
+        FuelInputParseSuccess(:final value) => value.toString(),
+        FuelInputParseFailure(:final userMessage) => userMessage,
+      };
 
       expect(describe(result), Decimal.parse('6.19').toString());
     });

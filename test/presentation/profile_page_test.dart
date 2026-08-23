@@ -81,10 +81,7 @@ void main() {
     await _pumpProfilePage(tester, repository);
     await tester.pumpAndSettle();
 
-    await tester.enterText(
-      find.byType(TextFormField).at(0),
-      'Meu carro',
-    );
+    await tester.enterText(find.byType(TextFormField).at(0), 'Meu carro');
     await tester.enterText(find.byType(TextFormField).at(1), '10,5');
     await tester.enterText(find.byType(TextFormField).at(2), '7');
 
@@ -93,15 +90,13 @@ void main() {
 
     expect(repository.saveCount, 1);
     expect(repository.saved?.name, 'Meu carro');
-    expect(
-      repository.saved?.gasolineKmPerLiter,
-      Decimal.parse('10.5'),
-    );
+    expect(repository.saved?.gasolineKmPerLiter, Decimal.parse('10.5'));
     expect(repository.saved?.ethanolKmPerLiter, Decimal.parse('7'));
   });
 
-  testWidgets('blank name shows inline error and does not save',
-      (tester) async {
+  testWidgets('blank name shows inline error and does not save', (
+    tester,
+  ) async {
     final _FakeVehicleProfileRepository repository =
         _FakeVehicleProfileRepository();
 
@@ -115,8 +110,9 @@ void main() {
     expect(repository.saveCount, 0);
   });
 
-  testWidgets('strips invalid characters from consumption while typing',
-      (tester) async {
+  testWidgets('strips invalid characters from consumption while typing', (
+    tester,
+  ) async {
     final _FakeVehicleProfileRepository repository =
         _FakeVehicleProfileRepository();
 
@@ -136,12 +132,12 @@ void main() {
   testWidgets('prefills fields from loaded profile', (tester) async {
     final _FakeVehicleProfileRepository repository =
         _FakeVehicleProfileRepository(
-      initial: VehicleProfile(
-        name: 'Fusca',
-        gasolineKmPerLiter: Decimal.parse('10.5'),
-        ethanolKmPerLiter: Decimal.parse('7'),
-      ),
-    );
+          initial: VehicleProfile(
+            name: 'Fusca',
+            gasolineKmPerLiter: Decimal.parse('10.5'),
+            ethanolKmPerLiter: Decimal.parse('7'),
+          ),
+        );
 
     await _pumpProfilePage(tester, repository);
     await tester.pumpAndSettle();

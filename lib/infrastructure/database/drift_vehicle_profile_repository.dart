@@ -6,13 +6,12 @@ import 'package:fuelwise/domain/vehicle_profile.dart';
 import 'package:fuelwise/infrastructure/database/app_database.dart';
 import 'package:fuelwise/infrastructure/database/vehicle_profile_mapper.dart';
 
-final class DriftVehicleProfileRepository
-    implements VehicleProfileRepository {
+final class DriftVehicleProfileRepository implements VehicleProfileRepository {
   final AppDatabase _database;
   final VehicleProfileMapper _mapper;
 
   DriftVehicleProfileRepository(this._database)
-      : _mapper = const VehicleProfileMapper();
+    : _mapper = const VehicleProfileMapper();
 
   @override
   Future<VehicleProfile?> load() async {
@@ -35,10 +34,8 @@ final class DriftVehicleProfileRepository
         final stored = await _database.insertVehicleProfile(
           VehicleProfilesCompanion.insert(
             name: profile.name,
-            gasolineKmPerLiter:
-                Value(profile.gasolineKmPerLiter?.toString()),
-            ethanolKmPerLiter:
-                Value(profile.ethanolKmPerLiter?.toString()),
+            gasolineKmPerLiter: Value(profile.gasolineKmPerLiter?.toString()),
+            ethanolKmPerLiter: Value(profile.ethanolKmPerLiter?.toString()),
             updatedAt: updatedAt,
           ),
         );
@@ -48,10 +45,8 @@ final class DriftVehicleProfileRepository
       await _database.updateVehicleProfile(
         existing.copyWith(
           name: profile.name,
-          gasolineKmPerLiter:
-              Value(profile.gasolineKmPerLiter?.toString()),
-          ethanolKmPerLiter:
-              Value(profile.ethanolKmPerLiter?.toString()),
+          gasolineKmPerLiter: Value(profile.gasolineKmPerLiter?.toString()),
+          ethanolKmPerLiter: Value(profile.ethanolKmPerLiter?.toString()),
           updatedAt: updatedAt,
         ),
       );
@@ -59,10 +54,7 @@ final class DriftVehicleProfileRepository
       final stored = await _database.getVehicleProfile();
 
       if (stored == null) {
-        throw VehicleProfileStorageException(
-          'id',
-          existing.id.toString(),
-        );
+        throw VehicleProfileStorageException('id', existing.id.toString());
       }
 
       return _mapper.toDomain(stored);

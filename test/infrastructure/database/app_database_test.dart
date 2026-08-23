@@ -20,8 +20,10 @@ void main() {
 
   test('creates both tables on open', () async {
     final vehicles = await database
-        .customSelect('SELECT name FROM sqlite_master WHERE type = ?',
-            variables: [Variable.withString('table')])
+        .customSelect(
+          'SELECT name FROM sqlite_master WHERE type = ?',
+          variables: [Variable.withString('table')],
+        )
         .get();
 
     final names = vehicles.map((row) => row.read<String>('name')).toSet();
@@ -46,7 +48,10 @@ void main() {
     expect(loaded.name, 'City car');
     expect(loaded.gasolineKmPerLiter, '12.5');
     expect(loaded.ethanolKmPerLiter, '8.4');
-    expect(loaded.updatedAt.isAtSameMomentAs(DateTime.utc(2026, 1, 2, 3, 4, 5)), isTrue);
+    expect(
+      loaded.updatedAt.isAtSameMomentAs(DateTime.utc(2026, 1, 2, 3, 4, 5)),
+      isTrue,
+    );
   });
 
   test('updates profile name and reads it back', () async {
@@ -57,9 +62,7 @@ void main() {
       ),
     );
 
-    await database.updateVehicleProfile(
-      inserted.copyWith(name: 'New name'),
-    );
+    await database.updateVehicleProfile(inserted.copyWith(name: 'New name'));
 
     final loaded = await database.getVehicleProfile();
 
@@ -94,10 +97,9 @@ void main() {
       ),
     );
 
-    final loaded =
-        await (database.select(database.historyEntries)
-              ..where((t) => t.id.equals(inserted.id)))
-            .getSingle();
+    final loaded = await (database.select(
+      database.historyEntries,
+    )..where((t) => t.id.equals(inserted.id))).getSingle();
 
     expect(loaded.createdAt.isAtSameMomentAs(createdAt), isTrue);
     expect(loaded.gasolinePrice, '6.09');

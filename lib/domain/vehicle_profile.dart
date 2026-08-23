@@ -5,7 +5,11 @@ final class VehicleProfile {
   final Decimal? gasolineKmPerLiter;
   final Decimal? ethanolKmPerLiter;
 
-  const VehicleProfile._(this.name, this.gasolineKmPerLiter, this.ethanolKmPerLiter);
+  const VehicleProfile._(
+    this.name,
+    this.gasolineKmPerLiter,
+    this.ethanolKmPerLiter,
+  );
 
   factory VehicleProfile({
     required String name,
@@ -21,11 +25,7 @@ final class VehicleProfile {
     _validate(gasolineKmPerLiter, 'gasolineKmPerLiter');
     _validate(ethanolKmPerLiter, 'ethanolKmPerLiter');
 
-    return VehicleProfile._(
-      trimmedName,
-      gasolineKmPerLiter,
-      ethanolKmPerLiter,
-    );
+    return VehicleProfile._(trimmedName, gasolineKmPerLiter, ethanolKmPerLiter);
   }
 
   static void _validate(Decimal? value, String name) {
@@ -50,9 +50,12 @@ final class VehicleProfile {
   }) {
     return VehicleProfile(
       name: name?.trim() ?? this.name,
-      gasolineKmPerLiter:
-          setGasoline ? gasolineKmPerLiter : this.gasolineKmPerLiter,
-      ethanolKmPerLiter: setEthanol ? ethanolKmPerLiter : this.ethanolKmPerLiter,
+      gasolineKmPerLiter: setGasoline
+          ? gasolineKmPerLiter
+          : this.gasolineKmPerLiter,
+      ethanolKmPerLiter: setEthanol
+          ? ethanolKmPerLiter
+          : this.ethanolKmPerLiter,
     );
   }
 

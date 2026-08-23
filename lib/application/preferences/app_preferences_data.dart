@@ -12,10 +12,10 @@ final class AppPreferencesData {
   });
 
   const AppPreferencesData.defaults()
-      : hasSeenWelcome = false,
-        ruleMode = RuleMode.standard,
-        customThreshold = null,
-        themeMode = ThemeModePreference.system;
+    : hasSeenWelcome = false,
+      ruleMode = RuleMode.standard,
+      customThreshold = null,
+      themeMode = ThemeModePreference.system;
 
   final bool hasSeenWelcome;
   final RuleMode ruleMode;
@@ -32,8 +32,9 @@ final class AppPreferencesData {
     return AppPreferencesData(
       hasSeenWelcome: hasSeenWelcome ?? this.hasSeenWelcome,
       ruleMode: ruleMode ?? this.ruleMode,
-      customThreshold:
-          setCustomThreshold ? customThreshold : this.customThreshold,
+      customThreshold: setCustomThreshold
+          ? customThreshold
+          : this.customThreshold,
       themeMode: themeMode ?? this.themeMode,
     );
   }

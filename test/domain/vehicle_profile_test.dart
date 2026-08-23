@@ -41,27 +41,19 @@ void main() {
 
     group('name validation', () {
       test('rejects blank name', () {
-        expect(
-          () => VehicleProfile(name: ''),
-          throwsArgumentError,
-        );
+        expect(() => VehicleProfile(name: ''), throwsArgumentError);
       });
 
       test('rejects whitespace-only name', () {
-        expect(
-          () => VehicleProfile(name: '   '),
-          throwsArgumentError,
-        );
+        expect(() => VehicleProfile(name: '   '), throwsArgumentError);
       });
     });
 
     group('gasoline consumption validation', () {
       test('rejects zero gasoline consumption', () {
         expect(
-          () => VehicleProfile(
-            name: 'My Car',
-            gasolineKmPerLiter: Decimal.zero,
-          ),
+          () =>
+              VehicleProfile(name: 'My Car', gasolineKmPerLiter: Decimal.zero),
           throwsArgumentError,
         );
       });
@@ -80,10 +72,7 @@ void main() {
     group('ethanol consumption validation', () {
       test('rejects zero ethanol consumption', () {
         expect(
-          () => VehicleProfile(
-            name: 'My Car',
-            ethanolKmPerLiter: Decimal.zero,
-          ),
+          () => VehicleProfile(name: 'My Car', ethanolKmPerLiter: Decimal.zero),
           throwsArgumentError,
         );
       });

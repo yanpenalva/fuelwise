@@ -14,9 +14,7 @@ class VehicleEfficiency {
     _validate(ethanolKmPerLiter, 'ethanolKmPerLiter');
 
     if (gasolineKmPerLiter == null && ethanolKmPerLiter == null) {
-      throw ArgumentError(
-        'at least one consumption value must be provided',
-      );
+      throw ArgumentError('at least one consumption value must be provided');
     }
 
     return VehicleEfficiency._(gasolineKmPerLiter, ethanolKmPerLiter);

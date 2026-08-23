@@ -37,7 +37,9 @@ final class _InMemoryAppPreferences implements AppPreferences {
 Future<void> _pumpHome(WidgetTester tester, AppPreferences repository) {
   return tester.pumpWidget(
     ProviderScope(
-      overrides: [appPreferencesRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        appPreferencesRepositoryProvider.overrideWithValue(repository),
+      ],
       child: const MaterialApp(home: HomePage()),
     ),
   );
@@ -45,8 +47,9 @@ Future<void> _pumpHome(WidgetTester tester, AppPreferences repository) {
 
 void main() {
   testWidgets('shows welcome dialog once on first run', (tester) async {
-    final _InMemoryAppPreferences repository =
-        _InMemoryAppPreferences(const AppPreferencesData.defaults());
+    final _InMemoryAppPreferences repository = _InMemoryAppPreferences(
+      const AppPreferencesData.defaults(),
+    );
     await _pumpHome(tester, repository);
     await tester.pumpAndSettle();
 
@@ -75,18 +78,20 @@ void main() {
     expect(find.text('Bem-vindo ao Fuelwise'), findsNothing);
   });
 
-  testWidgets('shows branded loading instead of form while preferences loading',
-      (tester) async {
-    await _pumpHome(
-      tester,
-      _InMemoryAppPreferences(const AppPreferencesData.defaults()),
-    );
-    await tester.pump();
+  testWidgets(
+    'shows branded loading instead of form while preferences loading',
+    (tester) async {
+      await _pumpHome(
+        tester,
+        _InMemoryAppPreferences(const AppPreferencesData.defaults()),
+      );
+      await tester.pump();
 
-    expect(find.text('Combustível certo, custo consciente.'), findsOneWidget);
-    expect(find.text('Bem-vindo ao Fuelwise'), findsNothing);
+      expect(find.text('Combustível certo, custo consciente.'), findsOneWidget);
+      expect(find.text('Bem-vindo ao Fuelwise'), findsNothing);
 
-    await tester.pumpAndSettle();
-    expect(find.text('Bem-vindo ao Fuelwise'), findsOneWidget);
-  });
+      await tester.pumpAndSettle();
+      expect(find.text('Bem-vindo ao Fuelwise'), findsOneWidget);
+    },
+  );
 }

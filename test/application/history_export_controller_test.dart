@@ -26,31 +26,37 @@ final class _FakeExportService implements HistoryExportService {
 }
 
 void main() {
-  test('export transitions idle to exporting to ready with file path',
-      () async {
-    final _FakeExportService service = _FakeExportService();
-    final ProviderContainer container = ProviderContainer(
-      overrides: [historyExportServiceProvider.overrideWithValue(service)],
-    );
-    addTearDown(container.dispose);
+  test(
+    'export transitions idle to exporting to ready with file path',
+    () async {
+      final _FakeExportService service = _FakeExportService();
+      final ProviderContainer container = ProviderContainer(
+        overrides: [historyExportServiceProvider.overrideWithValue(service)],
+      );
+      addTearDown(container.dispose);
 
-    expect(container.read(historyExportProvider), isA<HistoryExportIdle>());
+      expect(container.read(historyExportProvider), isA<HistoryExportIdle>());
 
-    final Future<void> exportingFuture =
-        container.read(historyExportProvider.notifier).export(
-              entries: const <CalculationHistoryEntry>[],
-              vehicleName: 'Meu carro',
-            );
+      final Future<void> exportingFuture = container
+          .read(historyExportProvider.notifier)
+          .export(
+            entries: const <CalculationHistoryEntry>[],
+            vehicleName: 'Meu carro',
+          );
 
-    expect(container.read(historyExportProvider), isA<HistoryExporting>());
+      expect(container.read(historyExportProvider), isA<HistoryExporting>());
 
-    await exportingFuture;
+      await exportingFuture;
 
-    final HistoryExportStatus state = container.read(historyExportProvider);
-    expect(state, isA<HistoryExportReady>());
-    expect((state as HistoryExportReady).filePath, '/tmp/fuelwise_export.csv');
-    expect(service.exportedVehicleName, 'Meu carro');
-  });
+      final HistoryExportStatus state = container.read(historyExportProvider);
+      expect(state, isA<HistoryExportReady>());
+      expect(
+        (state as HistoryExportReady).filePath,
+        '/tmp/fuelwise_export.csv',
+      );
+      expect(service.exportedVehicleName, 'Meu carro');
+    },
+  );
 
   test('export failure surfaces explicit failure state', () async {
     final _FakeExportService service = _FakeExportService(fail: true);
@@ -59,15 +65,16 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(historyExportProvider.notifier).export(
-          entries: const <CalculationHistoryEntry>[],
-          vehicleName: null,
-        );
+    await container
+        .read(historyExportProvider.notifier)
+        .export(entries: const <CalculationHistoryEntry>[], vehicleName: null);
 
     final HistoryExportStatus state = container.read(historyExportProvider);
     expect(state, isA<HistoryExportFailure>());
-    expect((state as HistoryExportFailure).message,
-        'Não foi possível exportar o histórico.');
+    expect(
+      (state as HistoryExportFailure).message,
+      'Não foi possível exportar o histórico.',
+    );
   });
 
   test('reset returns to idle', () async {
@@ -78,10 +85,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(historyExportProvider.notifier).export(
-          entries: const <CalculationHistoryEntry>[],
-          vehicleName: null,
-        );
+    await container
+        .read(historyExportProvider.notifier)
+        .export(entries: const <CalculationHistoryEntry>[], vehicleName: null);
 
     await container.read(historyExportProvider.notifier).reset();
 

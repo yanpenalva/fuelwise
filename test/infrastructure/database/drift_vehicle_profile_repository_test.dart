@@ -41,10 +41,7 @@ void main() {
 
   test('save and load round-trip decimals exactly', () async {
     final saved = await repository.save(
-      profile(
-        gasoline: Decimal.parse('12.50'),
-        ethanol: Decimal.parse('8.4'),
-      ),
+      profile(gasoline: Decimal.parse('12.50'), ethanol: Decimal.parse('8.4')),
     );
 
     final loaded = await repository.load();
@@ -86,10 +83,7 @@ void main() {
       ),
     );
 
-    expect(
-      repository.load,
-      throwsA(isA<VehicleProfileStorageException>()),
-    );
+    expect(repository.load, throwsA(isA<VehicleProfileStorageException>()));
   });
 
   test('stored zero consumption throws on load', () async {
@@ -101,10 +95,7 @@ void main() {
       ),
     );
 
-    expect(
-      repository.load,
-      throwsA(isA<VehicleProfileStorageException>()),
-    );
+    expect(repository.load, throwsA(isA<VehicleProfileStorageException>()));
   });
 
   test('stored negative consumption throws on load', () async {
@@ -116,9 +107,6 @@ void main() {
       ),
     );
 
-    expect(
-      repository.load,
-      throwsA(isA<VehicleProfileStorageException>()),
-    );
+    expect(repository.load, throwsA(isA<VehicleProfileStorageException>()));
   });
 }

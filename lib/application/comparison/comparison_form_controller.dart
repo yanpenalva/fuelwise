@@ -14,10 +14,10 @@ import '../preferences/rule_mode.dart';
 import 'comparison_form_state.dart';
 
 final NotifierProvider<ComparisonFormController, ComparisonFormState>
-    comparisonFormProvider =
+comparisonFormProvider =
     NotifierProvider<ComparisonFormController, ComparisonFormState>(
-  ComparisonFormController.new,
-);
+      ComparisonFormController.new,
+    );
 
 class ComparisonFormController extends Notifier<ComparisonFormState> {
   @override
@@ -44,10 +44,12 @@ class ComparisonFormController extends Notifier<ComparisonFormState> {
 
     final String? gasolinePriceError = _errorMessage(gasolinePriceResult);
     final String? ethanolPriceError = _errorMessage(ethanolPriceResult);
-    final String? gasolineConsumptionError =
-        _errorMessage(gasolineConsumptionResult);
-    final String? ethanolConsumptionError =
-        _errorMessage(ethanolConsumptionResult);
+    final String? gasolineConsumptionError = _errorMessage(
+      gasolineConsumptionResult,
+    );
+    final String? ethanolConsumptionError = _errorMessage(
+      ethanolConsumptionResult,
+    );
 
     if (gasolinePriceError != null ||
         ethanolPriceError != null ||
@@ -84,8 +86,9 @@ class ComparisonFormController extends Notifier<ComparisonFormState> {
         applyCustomThreshold: applyCustomThreshold,
       );
 
-      final FuelCalculationResult result =
-          const FuelCalculator().calculate(input);
+      final FuelCalculationResult result = const FuelCalculator().calculate(
+        input,
+      );
 
       state = state.copyWith(result: result);
 
@@ -98,8 +101,9 @@ class ComparisonFormController extends Notifier<ComparisonFormState> {
         state = state.copyWith(historySave: const HistorySaveSuccess());
       } catch (_) {
         state = state.copyWith(
-          historySave:
-              const HistorySaveFailure('Não foi possível salvar no histórico.'),
+          historySave: const HistorySaveFailure(
+            'Não foi possível salvar no histórico.',
+          ),
         );
       }
     } finally {
@@ -115,7 +119,9 @@ class ComparisonFormController extends Notifier<ComparisonFormState> {
     FuelInputParseResult gasolineConsumptionResult,
     FuelInputParseResult ethanolConsumptionResult,
   ) {
-    final Decimal? gasolineConsumption = _successValue(gasolineConsumptionResult);
+    final Decimal? gasolineConsumption = _successValue(
+      gasolineConsumptionResult,
+    );
     final Decimal? ethanolConsumption = _successValue(ethanolConsumptionResult);
 
     if (gasolineConsumption == null && ethanolConsumption == null) {

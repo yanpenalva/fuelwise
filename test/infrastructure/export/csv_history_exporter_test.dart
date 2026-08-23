@@ -36,7 +36,10 @@ CalculationHistoryEntry _entry({
 
 void main() {
   test('builds header row with useful columns only', () {
-    const CsvHistoryJob job = CsvHistoryJob(entries: <CalculationHistoryEntry>[], vehicleName: null);
+    const CsvHistoryJob job = CsvHistoryJob(
+      entries: <CalculationHistoryEntry>[],
+      vehicleName: null,
+    );
 
     final String csv = buildHistoryCsv(job);
     final List<String> lines = csv.trim().split('\n');

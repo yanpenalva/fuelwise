@@ -38,13 +38,13 @@ class FuelCalculationResult {
 
   @override
   int get hashCode => Object.hash(
-        recommendedFuel,
-        ratio,
-        appliedThreshold,
-        thresholdSource,
-        gasolineCostPerKilometer,
-        ethanolCostPerKilometer,
-        maximumEthanolPrice,
-        difference,
-      );
+    recommendedFuel,
+    ratio,
+    appliedThreshold,
+    thresholdSource,
+    gasolineCostPerKilometer,
+    ethanolCostPerKilometer,
+    maximumEthanolPrice,
+    difference,
+  );
 }

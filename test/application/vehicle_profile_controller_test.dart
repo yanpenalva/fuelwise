@@ -29,8 +29,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final VehicleProfile? profile =
-        await container.read(vehicleProfileProvider.future);
+    final VehicleProfile? profile = await container.read(
+      vehicleProfileProvider.future,
+    );
 
     expect(profile, isNull);
   });
@@ -45,8 +46,9 @@ void main() {
     );
     addTearDown(container.dispose);
     await container.read(vehicleProfileProvider.future);
-    final VehicleProfileController controller =
-        container.read(vehicleProfileProvider.notifier);
+    final VehicleProfileController controller = container.read(
+      vehicleProfileProvider.notifier,
+    );
 
     final VehicleProfile profile = VehicleProfile(name: 'Car');
     await controller.save(profile);
@@ -65,8 +67,9 @@ void main() {
     );
     addTearDown(container.dispose);
     await container.read(vehicleProfileProvider.future);
-    final VehicleProfileController controller =
-        container.read(vehicleProfileProvider.notifier);
+    final VehicleProfileController controller = container.read(
+      vehicleProfileProvider.notifier,
+    );
 
     await controller.save(VehicleProfile(name: 'Car'));
     await controller.save(VehicleProfile(name: 'Bike'));

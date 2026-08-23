@@ -10,8 +10,10 @@ final class VehicleProfileMapper {
   VehicleProfile toDomain(VehicleProfileRow row) {
     return VehicleProfile(
       name: row.name,
-      gasolineKmPerLiter:
-          _toDecimal(row.gasolineKmPerLiter, 'gasolineKmPerLiter'),
+      gasolineKmPerLiter: _toDecimal(
+        row.gasolineKmPerLiter,
+        'gasolineKmPerLiter',
+      ),
       ethanolKmPerLiter: _toDecimal(row.ethanolKmPerLiter, 'ethanolKmPerLiter'),
     );
   }

@@ -62,13 +62,13 @@ final class ComparisonFormState {
   });
 
   const ComparisonFormState.initial()
-      : isSubmitting = false,
-        gasolinePriceError = null,
-        ethanolPriceError = null,
-        gasolineConsumptionError = null,
-        ethanolConsumptionError = null,
-        result = null,
-        historySave = const HistorySaveIdle();
+    : isSubmitting = false,
+      gasolinePriceError = null,
+      ethanolPriceError = null,
+      gasolineConsumptionError = null,
+      ethanolConsumptionError = null,
+      result = null,
+      historySave = const HistorySaveIdle();
 
   final bool isSubmitting;
   final String? gasolinePriceError;
@@ -140,12 +140,12 @@ final class ComparisonFormState {
 
   @override
   int get hashCode => Object.hash(
-        isSubmitting,
-        gasolinePriceError,
-        ethanolPriceError,
-        gasolineConsumptionError,
-        ethanolConsumptionError,
-        result,
-        historySave,
-      );
+    isSubmitting,
+    gasolinePriceError,
+    ethanolPriceError,
+    gasolineConsumptionError,
+    ethanolConsumptionError,
+    result,
+    historySave,
+  );
 }

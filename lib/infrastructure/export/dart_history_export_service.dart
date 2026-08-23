@@ -17,13 +17,14 @@ final class DartHistoryExportService implements HistoryExportService {
       buildHistoryCsv,
       CsvHistoryJob(entries: entries, vehicleName: vehicleName),
     );
-    final Directory directory = await Directory.systemTemp.createTemp('fuelwise');
+    final Directory directory = await Directory.systemTemp.createTemp(
+      'fuelwise',
+    );
     final DateTime now = DateTime.now();
     final String stamp =
         '${now.year}${_pad(now.month)}${_pad(now.day)}_'
         '${_pad(now.hour)}${_pad(now.minute)}${_pad(now.second)}';
-    final File file =
-        File('${directory.path}/fuelwise_historico_$stamp.csv');
+    final File file = File('${directory.path}/fuelwise_historico_$stamp.csv');
     await file.writeAsString('\uFEFF$csv', flush: true);
 
     return file.path;

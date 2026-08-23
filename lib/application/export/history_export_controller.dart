@@ -35,10 +35,10 @@ final Provider<HistoryExportService> historyExportServiceProvider =
     Provider<HistoryExportService>((Ref ref) => throw UnimplementedError());
 
 final NotifierProvider<HistoryExportController, HistoryExportStatus>
-    historyExportProvider =
+historyExportProvider =
     NotifierProvider<HistoryExportController, HistoryExportStatus>(
-  HistoryExportController.new,
-);
+      HistoryExportController.new,
+    );
 
 class HistoryExportController extends Notifier<HistoryExportStatus> {
   int _nextExportId = 1;
@@ -53,15 +53,17 @@ class HistoryExportController extends Notifier<HistoryExportStatus> {
     required String? vehicleName,
   }) async {
     final HistoryExportStatus current = state;
-    final int exportId =
-        current is HistoryExporting ? current.exportId : _nextExportId;
+    final int exportId = current is HistoryExporting
+        ? current.exportId
+        : _nextExportId;
 
     _nextExportId = exportId + 1;
     state = HistoryExporting(exportId: exportId);
 
     try {
-      final HistoryExportService service =
-          ref.read(historyExportServiceProvider);
+      final HistoryExportService service = ref.read(
+        historyExportServiceProvider,
+      );
       final String filePath = await service.exportCsv(
         entries: entries,
         vehicleName: vehicleName,

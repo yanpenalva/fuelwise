@@ -15,22 +15,41 @@ final class CalculationHistoryMapper {
       createdAt: row.createdAt,
       gasolinePrice: _toRequiredDecimal(row.gasolinePrice, 'gasolinePrice'),
       ethanolPrice: _toRequiredDecimal(row.ethanolPrice, 'ethanolPrice'),
-      gasolineConsumption:
-          _toDecimal(row.gasolineConsumption, 'gasolineConsumption'),
-      ethanolConsumption:
-          _toDecimal(row.ethanolConsumption, 'ethanolConsumption'),
-      recommendedFuel: _toEnum(FuelType.values, row.recommendedFuel, 'recommendedFuel'),
+      gasolineConsumption: _toDecimal(
+        row.gasolineConsumption,
+        'gasolineConsumption',
+      ),
+      ethanolConsumption: _toDecimal(
+        row.ethanolConsumption,
+        'ethanolConsumption',
+      ),
+      recommendedFuel: _toEnum(
+        FuelType.values,
+        row.recommendedFuel,
+        'recommendedFuel',
+      ),
       ratio: _toRequiredDecimal(row.ratio, 'ratio'),
-      appliedThreshold:
-          _toRequiredDecimal(row.appliedThreshold, 'appliedThreshold'),
-      thresholdSource:
-          _toEnum(ThresholdSource.values, row.thresholdSource, 'thresholdSource'),
-      gasolineCostPerKilometer:
-          _toDecimal(row.gasolineCostPerKm, 'gasolineCostPerKm'),
-      ethanolCostPerKilometer:
-          _toDecimal(row.ethanolCostPerKm, 'ethanolCostPerKm'),
-      maximumEthanolPrice:
-          _toRequiredDecimal(row.maximumEthanolPrice, 'maximumEthanolPrice'),
+      appliedThreshold: _toRequiredDecimal(
+        row.appliedThreshold,
+        'appliedThreshold',
+      ),
+      thresholdSource: _toEnum(
+        ThresholdSource.values,
+        row.thresholdSource,
+        'thresholdSource',
+      ),
+      gasolineCostPerKilometer: _toDecimal(
+        row.gasolineCostPerKm,
+        'gasolineCostPerKm',
+      ),
+      ethanolCostPerKilometer: _toDecimal(
+        row.ethanolCostPerKm,
+        'ethanolCostPerKm',
+      ),
+      maximumEthanolPrice: _toRequiredDecimal(
+        row.maximumEthanolPrice,
+        'maximumEthanolPrice',
+      ),
       difference: _toRequiredDecimal(row.difference, 'difference'),
     );
   }

@@ -13,7 +13,7 @@ final class DriftCalculationHistoryRepository
   final CalculationHistoryMapper _mapper;
 
   DriftCalculationHistoryRepository(this._database)
-      : _mapper = const CalculationHistoryMapper();
+    : _mapper = const CalculationHistoryMapper();
 
   @override
   Future<List<CalculationHistoryEntry>> loadAll() async {
@@ -32,18 +32,18 @@ final class DriftCalculationHistoryRepository
         createdAt: DateTime.now().toUtc(),
         gasolinePrice: input.gasolinePrice.value.toString(),
         ethanolPrice: input.ethanolPrice.value.toString(),
-        gasolineConsumption:
-            Value(input.efficiency?.gasolineKmPerLiter?.toString()),
-        ethanolConsumption:
-            Value(input.efficiency?.ethanolKmPerLiter?.toString()),
+        gasolineConsumption: Value(
+          input.efficiency?.gasolineKmPerLiter?.toString(),
+        ),
+        ethanolConsumption: Value(
+          input.efficiency?.ethanolKmPerLiter?.toString(),
+        ),
         recommendedFuel: result.recommendedFuel.name,
         ratio: result.ratio.toString(),
         appliedThreshold: result.appliedThreshold.toString(),
         thresholdSource: result.thresholdSource.name,
-        gasolineCostPerKm:
-            Value(result.gasolineCostPerKilometer?.toString()),
-        ethanolCostPerKm:
-            Value(result.ethanolCostPerKilometer?.toString()),
+        gasolineCostPerKm: Value(result.gasolineCostPerKilometer?.toString()),
+        ethanolCostPerKm: Value(result.ethanolCostPerKilometer?.toString()),
         maximumEthanolPrice: result.maximumEthanolPrice.toString(),
         difference: result.difference.toString(),
       ),

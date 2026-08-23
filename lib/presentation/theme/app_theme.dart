@@ -4,15 +4,15 @@ final class AppTheme {
   const AppTheme._();
 
   static ThemeData get light => ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-      );
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+  );
 
   static ThemeData get dark => ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.dark,
-        ),
-      );
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.green,
+      brightness: Brightness.dark,
+    ),
+  );
 }

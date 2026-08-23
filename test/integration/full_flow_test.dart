@@ -39,12 +39,14 @@ Future<void> _pumpApp(
   );
   addTearDown(container.dispose);
 
-  return tester.pumpWidget(
-    UncontrolledProviderScope(
-      container: container,
-      child: const FuelwiseApp(),
-    ),
-  ).then((_) => tester.pumpAndSettle());
+  return tester
+      .pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const FuelwiseApp(),
+        ),
+      )
+      .then((_) => tester.pumpAndSettle());
 }
 
 Future<void> _calculate(
@@ -86,32 +88,31 @@ void main() {
     await database.close();
   });
 
-  testWidgets(
-    'records exactly one history entry per valid calculation',
-    (tester) async {
-      await _pumpApp(tester, database: database, preferences: preferences);
+  testWidgets('records exactly one history entry per valid calculation', (
+    tester,
+  ) async {
+    await _pumpApp(tester, database: database, preferences: preferences);
 
-      await _calculate(tester, gasolinePrice: '6,00', ethanolPrice: '4,19');
-      expect(find.text('Abasteça com etanol'), findsOneWidget);
-      expect(find.text('Salvo no histórico.'), findsOneWidget);
+    await _calculate(tester, gasolinePrice: '6,00', ethanolPrice: '4,19');
+    expect(find.text('Abasteça com etanol'), findsOneWidget);
+    expect(find.text('Salvo no histórico.'), findsOneWidget);
 
-      await tester.tap(find.text('Novo cálculo'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Novo cálculo'));
+    await tester.pumpAndSettle();
 
-      await _calculate(tester, gasolinePrice: '6,00', ethanolPrice: '4,50');
-      expect(find.text('Salvo no histórico.'), findsOneWidget);
+    await _calculate(tester, gasolinePrice: '6,00', ethanolPrice: '4,50');
+    expect(find.text('Salvo no histórico.'), findsOneWidget);
 
-      final historyRepository = DriftCalculationHistoryRepository(database);
-      final entries = await historyRepository.loadAll();
+    final historyRepository = DriftCalculationHistoryRepository(database);
+    final entries = await historyRepository.loadAll();
 
-      expect(entries.length, 2);
-      expect(entries[0].ethanolPrice.toString(), '4.5');
-      expect(entries[1].ethanolPrice.toString(), '4.19');
-      expect(entries[0].recommendedFuel, FuelType.gasoline);
-      expect(entries[1].recommendedFuel, FuelType.ethanol);
-      expect(entries[1].thresholdSource, ThresholdSource.standard);
-    },
-  );
+    expect(entries.length, 2);
+    expect(entries[0].ethanolPrice.toString(), '4.5');
+    expect(entries[1].ethanolPrice.toString(), '4.19');
+    expect(entries[0].recommendedFuel, FuelType.gasoline);
+    expect(entries[1].recommendedFuel, FuelType.ethanol);
+    expect(entries[1].thresholdSource, ThresholdSource.standard);
+  });
 
   testWidgets(
     'starts with empty consumption fields despite a persisted profile',

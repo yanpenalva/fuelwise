@@ -30,19 +30,14 @@ Future<void> _pumpApp(WidgetTester tester) async {
 
 void main() {
   test('builds the release label', () {
-    expect(
-      AppRelease.label,
-      equals('v1.0.0 · 22/08/2026 · yanpenalva'),
-    );
+    expect(AppRelease.label, equals('v1.0.0 · 22/08/2026 · yanpenalva'));
   });
 
-  testWidgets('shows release info at the bottom of the home form',
-      (tester) async {
+  testWidgets('shows release info at the bottom of the home form', (
+    tester,
+  ) async {
     await _pumpApp(tester);
 
-    expect(
-      find.text('v1.0.0 · 22/08/2026 · yanpenalva'),
-      findsOneWidget,
-    );
+    expect(find.text('v1.0.0 · 22/08/2026 · yanpenalva'), findsOneWidget);
   });
 }

@@ -56,19 +56,19 @@ final class CalculationHistoryEntry {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        createdAt,
-        gasolinePrice,
-        ethanolPrice,
-        gasolineConsumption,
-        ethanolConsumption,
-        recommendedFuel,
-        ratio,
-        appliedThreshold,
-        thresholdSource,
-        gasolineCostPerKilometer,
-        ethanolCostPerKilometer,
-        maximumEthanolPrice,
-        difference,
-      );
+    id,
+    createdAt,
+    gasolinePrice,
+    ethanolPrice,
+    gasolineConsumption,
+    ethanolConsumption,
+    recommendedFuel,
+    ratio,
+    appliedThreshold,
+    thresholdSource,
+    gasolineCostPerKilometer,
+    ethanolCostPerKilometer,
+    maximumEthanolPrice,
+    difference,
+  );
 }

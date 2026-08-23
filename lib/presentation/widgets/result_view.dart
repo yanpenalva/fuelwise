@@ -42,8 +42,8 @@ class ResultView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                    color:
-                        _recommendationColor(result.recommendedFuel).withAlpha(70),
+                    color: _recommendationColor(result.recommendedFuel)
+                        .withAlpha(70),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -209,10 +209,7 @@ class ResultView extends StatelessWidget {
       title: Text(label),
       subtitle: Text(
         'R\$ ${_formatMoney(costPerKilometer)}',
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 15,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
       ),
     );
   }
@@ -228,8 +225,9 @@ class ResultView extends StatelessWidget {
   String _formatScaled(Decimal value, int scale) {
     final bool isNegative = value < Decimal.zero;
     final Decimal absolute = isNegative ? -value : value;
-    final BigInt smallestUnits =
-        (absolute * Decimal.fromInt(_pow10(scale))).round().toBigInt();
+    final BigInt smallestUnits = (absolute * Decimal.fromInt(_pow10(scale)))
+        .round()
+        .toBigInt();
     final String digits = smallestUnits.toString().padLeft(scale + 1, '0');
     final String intPart = digits.substring(0, digits.length - scale);
     final String fracPart = digits.substring(digits.length - scale);

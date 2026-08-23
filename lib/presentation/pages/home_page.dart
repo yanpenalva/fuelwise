@@ -31,8 +31,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   final TextEditingController _gasolinePriceController =
       TextEditingController();
-  final TextEditingController _ethanolPriceController =
-      TextEditingController();
+  final TextEditingController _ethanolPriceController = TextEditingController();
   final TextEditingController _gasolineConsumptionController =
       TextEditingController();
   final TextEditingController _ethanolConsumptionController =
@@ -61,8 +60,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _maybeShowWelcomeDialog() {
-    final AsyncValue<AppPreferencesData> preferences =
-        ref.watch(appPreferencesProvider);
+    final AsyncValue<AppPreferencesData> preferences = ref.watch(
+      appPreferencesProvider,
+    );
 
     final AppPreferencesData? data = preferences.value;
     if (data == null || data.hasSeenWelcome || _welcomeDialogShown) {
@@ -89,9 +89,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 8,
               children: <Widget>[
-                Text(
-                  'Descubra qual combustível compensa mais abastecer hoje.',
-                ),
+                Text('Descubra qual combustível compensa mais abastecer hoje.'),
                 Text('1. Informe o preço do litro da gasolina e do etanol.'),
                 Text(
                   '2. Opcionalmente, informe quantos km seu carro anda por litro com cada combustível.',
@@ -142,8 +140,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-            error ? Theme.of(context).colorScheme.error : null,
+        backgroundColor: error ? Theme.of(context).colorScheme.error : null,
       ),
     );
   }
@@ -221,10 +218,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                         child: Text(
                           'Compare os preços e descubra qual combustível '
                           'rende mais para o seu bolso.',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w500),
                         ),
                       ),
                     ],
@@ -311,8 +306,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   AppRelease.label,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],
@@ -323,8 +318,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _buildResult(FuelCalculationResult result) {
-    final HistorySaveStatus historySave =
-        ref.watch(comparisonFormProvider).historySave;
+    final HistorySaveStatus historySave = ref
+        .watch(comparisonFormProvider)
+        .historySave;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -377,8 +373,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 _slogan,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 24),
               const SizedBox(
@@ -396,8 +392,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     _maybeShowWelcomeDialog();
-    final AsyncValue<AppPreferencesData> preferences =
-        ref.watch(appPreferencesProvider);
+    final AsyncValue<AppPreferencesData> preferences = ref.watch(
+      appPreferencesProvider,
+    );
 
     if (preferences.isLoading || _splashTimer?.isActive == true) {
       return _buildLaunchLoading();

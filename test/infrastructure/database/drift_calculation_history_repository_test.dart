@@ -59,16 +59,13 @@ void main() {
       thresholdSource: thresholdSource,
       gasolineCostPerKilometer:
           gasolineCostPerKilometer ?? Decimal.parse('0.36'),
-      ethanolCostPerKilometer:
-          ethanolCostPerKilometer ?? Decimal.parse('0.31'),
-      maximumEthanolPrice:
-          maximumEthanolPrice ?? Decimal.parse('3.15'),
+      ethanolCostPerKilometer: ethanolCostPerKilometer ?? Decimal.parse('0.31'),
+      maximumEthanolPrice: maximumEthanolPrice ?? Decimal.parse('3.15'),
       difference: difference ?? Decimal.parse('0.05'),
     );
   }
 
-  test('record round-trips every field with exact decimal equality',
-      () async {
+  test('record round-trips every field with exact decimal equality', () async {
     final recorded = await repository.record(
       input: input(
         gasolinePrice: '4.555',
@@ -113,7 +110,7 @@ void main() {
   });
 
   test('consumption-less input stores null consumptions', () async {
-        await repository.record(input: input(), result: result());
+    await repository.record(input: input(), result: result());
 
     final rows = await database.select(database.historyEntries).get();
 
@@ -126,34 +123,35 @@ void main() {
     expect(loaded.single.ethanolConsumption, isNull);
   });
 
-  test('loadAll returns newest-first for sequentially inserted entries',
-      () async {
-    await repository.record(
-      input: input(gasolinePrice: '4.00', ethanolPrice: '2.90'),
-      result: result(ratio: Decimal.parse('0.72')),
-    );
-    await repository.record(
-      input: input(gasolinePrice: '4.10', ethanolPrice: '3.00'),
-      result: result(ratio: Decimal.parse('0.73')),
-    );
-    await repository.record(
-      input: input(gasolinePrice: '4.20', ethanolPrice: '3.05'),
-      result: result(ratio: Decimal.parse('0.74')),
-    );
+  test(
+    'loadAll returns newest-first for sequentially inserted entries',
+    () async {
+      await repository.record(
+        input: input(gasolinePrice: '4.00', ethanolPrice: '2.90'),
+        result: result(ratio: Decimal.parse('0.72')),
+      );
+      await repository.record(
+        input: input(gasolinePrice: '4.10', ethanolPrice: '3.00'),
+        result: result(ratio: Decimal.parse('0.73')),
+      );
+      await repository.record(
+        input: input(gasolinePrice: '4.20', ethanolPrice: '3.05'),
+        result: result(ratio: Decimal.parse('0.74')),
+      );
 
-    final loaded = await repository.loadAll();
+      final loaded = await repository.loadAll();
 
-    expect(loaded.map((entry) => entry.gasolinePrice).toList(), [
-      Decimal.parse('4.20'),
-      Decimal.parse('4.10'),
-      Decimal.parse('4.00'),
-    ]);
-    expect(loaded.first.id, greaterThan(loaded.last.id));
-  });
+      expect(loaded.map((entry) => entry.gasolinePrice).toList(), [
+        Decimal.parse('4.20'),
+        Decimal.parse('4.10'),
+        Decimal.parse('4.00'),
+      ]);
+      expect(loaded.first.id, greaterThan(loaded.last.id));
+    },
+  );
 
   test('deleteById removes exactly one row and keeps others', () async {
-    final first =
-        await repository.record(input: input(), result: result());
+    final first = await repository.record(input: input(), result: result());
     await repository.record(
       input: input(gasolinePrice: '5.00'),
       result: result(),
@@ -169,53 +167,54 @@ void main() {
 
     expect(rows, hasLength(2));
     expect(rows.map((row) => row.id), isNot(contains(first.id)));
-    expect(
-      await repository.loadAll(),
-      hasLength(2),
-    );
+    expect(await repository.loadAll(), hasLength(2));
   });
 
-  test("stored 'abc' ratio throws CalculationHistoryStorageException on load",
-      () async {
-    await database.insertHistoryEntry(
-      HistoryEntriesCompanion.insert(
-        createdAt: DateTime.utc(2026, 1, 1),
-        gasolinePrice: '4.50',
-        ethanolPrice: '3.10',
-        recommendedFuel: 'ethanol',
-        ratio: 'abc',
-        appliedThreshold: '0.70',
-        thresholdSource: 'standard',
-        maximumEthanolPrice: '3.15',
-        difference: '0.05',
-      ),
-    );
+  test(
+    "stored 'abc' ratio throws CalculationHistoryStorageException on load",
+    () async {
+      await database.insertHistoryEntry(
+        HistoryEntriesCompanion.insert(
+          createdAt: DateTime.utc(2026, 1, 1),
+          gasolinePrice: '4.50',
+          ethanolPrice: '3.10',
+          recommendedFuel: 'ethanol',
+          ratio: 'abc',
+          appliedThreshold: '0.70',
+          thresholdSource: 'standard',
+          maximumEthanolPrice: '3.15',
+          difference: '0.05',
+        ),
+      );
 
-    expect(
-      repository.loadAll,
-      throwsA(isA<CalculationHistoryStorageException>()),
-    );
-  });
+      expect(
+        repository.loadAll,
+        throwsA(isA<CalculationHistoryStorageException>()),
+      );
+    },
+  );
 
-  test('unknown threshold_source text throws storage exception on load',
-      () async {
-    await database.insertHistoryEntry(
-      HistoryEntriesCompanion.insert(
-        createdAt: DateTime.utc(2026, 1, 1),
-        gasolinePrice: '4.50',
-        ethanolPrice: '3.10',
-        recommendedFuel: 'ethanol',
-        ratio: '0.70',
-        appliedThreshold: '0.70',
-        thresholdSource: 'weird',
-        maximumEthanolPrice: '3.15',
-        difference: '0.05',
-      ),
-    );
+  test(
+    'unknown threshold_source text throws storage exception on load',
+    () async {
+      await database.insertHistoryEntry(
+        HistoryEntriesCompanion.insert(
+          createdAt: DateTime.utc(2026, 1, 1),
+          gasolinePrice: '4.50',
+          ethanolPrice: '3.10',
+          recommendedFuel: 'ethanol',
+          ratio: '0.70',
+          appliedThreshold: '0.70',
+          thresholdSource: 'weird',
+          maximumEthanolPrice: '3.15',
+          difference: '0.05',
+        ),
+      );
 
-    expect(
-      repository.loadAll,
-      throwsA(isA<CalculationHistoryStorageException>()),
-    );
-  });
+      expect(
+        repository.loadAll,
+        throwsA(isA<CalculationHistoryStorageException>()),
+      );
+    },
+  );
 }

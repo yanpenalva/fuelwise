@@ -2,7 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final class SystemExportNotifier {
   SystemExportNotifier([FlutterLocalNotificationsPlugin? notifications])
-      : _notifications = notifications ?? FlutterLocalNotificationsPlugin();
+    : _notifications = notifications ?? FlutterLocalNotificationsPlugin();
 
   final FlutterLocalNotificationsPlugin _notifications;
   bool _initialized = false;
@@ -20,9 +20,10 @@ final class SystemExportNotifier {
   }
 
   Future<bool> ensurePermission() async {
-    final AndroidFlutterLocalNotificationsPlugin? android =
-        _notifications.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final AndroidFlutterLocalNotificationsPlugin? android = _notifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     return (await android?.requestNotificationsPermission()) ?? true;
   }
@@ -32,14 +33,15 @@ final class SystemExportNotifier {
 
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'fuelwise_export',
-      'Exportações',
-      channelDescription: 'Notificações de exportação concluída',
-      importance: Importance.defaultImportance,
-      priority: Priority.defaultPriority,
+          'fuelwise_export',
+          'Exportações',
+          channelDescription: 'Notificações de exportação concluída',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+        );
+    const NotificationDetails details = NotificationDetails(
+      android: androidDetails,
     );
-    const NotificationDetails details =
-        NotificationDetails(android: androidDetails);
 
     final DateTime now = DateTime.now();
     await _notifications.show(

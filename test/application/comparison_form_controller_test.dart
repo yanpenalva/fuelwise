@@ -54,23 +54,25 @@ void main() {
     expect(history.recordedCount, 0);
   });
 
-  test('reports failure status without throwing when repository fails',
-      () async {
-    history.failNext = true;
-    await container
-        .read(comparisonFormProvider.notifier)
-        .submit(
-          gasolinePriceText: '6,00',
-          ethanolPriceText: '4,19',
-          gasolineConsumptionText: '',
-          ethanolConsumptionText: '',
-        );
+  test(
+    'reports failure status without throwing when repository fails',
+    () async {
+      history.failNext = true;
+      await container
+          .read(comparisonFormProvider.notifier)
+          .submit(
+            gasolinePriceText: '6,00',
+            ethanolPriceText: '4,19',
+            gasolineConsumptionText: '',
+            ethanolConsumptionText: '',
+          );
 
-    expect(state().result, isNotNull);
-    final HistorySaveStatus status = state().historySave;
-    expect(status, isA<HistorySaveFailure>());
-    expect((status as HistorySaveFailure).message, isNotEmpty);
-  });
+      expect(state().result, isNotNull);
+      final HistorySaveStatus status = state().historySave;
+      expect(status, isA<HistorySaveFailure>());
+      expect((status as HistorySaveFailure).message, isNotEmpty);
+    },
+  );
 
   test('reset clears result and errors', () async {
     await container
@@ -90,8 +92,9 @@ void main() {
   });
 
   test('sequential valid submissions each record one entry', () async {
-    final ComparisonFormController controller =
-        container.read(comparisonFormProvider.notifier);
+    final ComparisonFormController controller = container.read(
+      comparisonFormProvider.notifier,
+    );
     await controller.submit(
       gasolinePriceText: '6,00',
       ethanolPriceText: '4,19',

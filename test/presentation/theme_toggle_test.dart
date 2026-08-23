@@ -10,8 +10,9 @@ import 'package:fuelwise/main.dart';
 import '../helpers/fake_app_preferences.dart';
 
 void main() {
-  testWidgets('theme icon cycles system to light to dark and persists',
-      (tester) async {
+  testWidgets('theme icon cycles system to light to dark and persists', (
+    tester,
+  ) async {
     final FakeAppPreferences preferences = FakeAppPreferences(
       initial: const AppPreferencesData(
         hasSeenWelcome: true,
@@ -51,8 +52,9 @@ void main() {
     expect(preferences.themeMode, ThemeModePreference.system);
   });
 
-  testWidgets('starts on persisted dark preference with dark icon',
-      (tester) async {
+  testWidgets('starts on persisted dark preference with dark icon', (
+    tester,
+  ) async {
     final FakeAppPreferences preferences = FakeAppPreferences(
       initial: const AppPreferencesData(
         hasSeenWelcome: true,

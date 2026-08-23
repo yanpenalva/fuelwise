@@ -33,9 +33,14 @@ FuelCalculationResult _result({
   );
 }
 
-Future<void> _pumpResultView(WidgetTester tester, FuelCalculationResult result) {
+Future<void> _pumpResultView(
+  WidgetTester tester,
+  FuelCalculationResult result,
+) {
   return tester.pumpWidget(
-    MaterialApp(home: Scaffold(body: ResultView(result: result))),
+    MaterialApp(
+      home: Scaffold(body: ResultView(result: result)),
+    ),
   );
 }
 
@@ -61,14 +66,13 @@ void main() {
     },
   );
 
-  testWidgets(
-    'shows standard threshold source label when source is standard',
-    (WidgetTester tester) async {
-      await _pumpResultView(tester, _result());
+  testWidgets('shows standard threshold source label when source is standard', (
+    WidgetTester tester,
+  ) async {
+    await _pumpResultView(tester, _result());
 
-      expect(find.text('Limiar padrão (0,70)'), findsOneWidget);
-    },
-  );
+    expect(find.text('Limiar padrão (0,70)'), findsOneWidget);
+  });
 
   testWidgets(
     'shows custom threshold source label with custom threshold value',
@@ -86,41 +90,38 @@ void main() {
     },
   );
 
-  testWidgets(
-    'shows unavailable state for null cost per kilometer values',
-    (WidgetTester tester) async {
-      await _pumpResultView(tester, _result());
+  testWidgets('shows unavailable state for null cost per kilometer values', (
+    WidgetTester tester,
+  ) async {
+    await _pumpResultView(tester, _result());
 
-      expect(
-        find.text('Indisponível — informe os dois consumos'),
-        findsNWidgets(2),
-      );
-    },
-  );
+    expect(
+      find.text('Indisponível — informe os dois consumos'),
+      findsNWidgets(2),
+    );
+  });
 
-  testWidgets(
-    'formats ratio with comma decimal separator',
-    (WidgetTester tester) async {
-      await _pumpResultView(tester, _result(ratio: Decimal.parse('0.680')));
+  testWidgets('formats ratio with comma decimal separator', (
+    WidgetTester tester,
+  ) async {
+    await _pumpResultView(tester, _result(ratio: Decimal.parse('0.680')));
 
-      expect(find.text('0,680'), findsOneWidget);
-    },
-  );
+    expect(find.text('0,680'), findsOneWidget);
+  });
 
-  testWidgets(
-    'shows the max-price insight sentence',
-    (WidgetTester tester) async {
-      await _pumpResultView(
-        tester,
-        _result(maximumEthanolPrice: Decimal.parse('4.50')),
-      );
+  testWidgets('shows the max-price insight sentence', (
+    WidgetTester tester,
+  ) async {
+    await _pumpResultView(
+      tester,
+      _result(maximumEthanolPrice: Decimal.parse('4.50')),
+    );
 
-      expect(
-        find.textContaining('o etanol compensa até R\$ 4,50 por litro'),
-        findsOneWidget,
-      );
-    },
-  );
+    expect(
+      find.textContaining('o etanol compensa até R\$ 4,50 por litro'),
+      findsOneWidget,
+    );
+  });
 
   testWidgets(
     'shows cost per kilometer values when consumption data is complete',
